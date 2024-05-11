@@ -39,7 +39,7 @@ class HuggingFaceTuner:
 
     def __call__(self) -> None:
         study = optuna.create_study(
-            direction="maximize",
+            direction="minimize",
             sampler=TPESampler(seed=self.seed),
             pruner=HyperbandPruner(),
         )
@@ -153,4 +153,4 @@ class HuggingFaceTuner:
             )
             raise e
 
-        return trainer.callback_metrics["val_rougeLsum_fmeasure"].item()
+        return trainer.callback_metrics["val_loss"].item()
