@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: huggingface_kagglebbc_dataset
+  - dataset: huggingface_upstagedialogs_dataset
   - architecture: huggingface_architecture
   - tuner: huggingface_tuner
   - logger: wandb
@@ -8,7 +8,7 @@ defaults:
   - callbacks: callbacks
   - trainer: trainer
 
-package_name: kaggle-bbc-news-summary
+package_name: upstage-nlp
 project_dir: /home/ddang/${package_name}
 connected_dir: /data/${package_name}
 
@@ -29,12 +29,27 @@ model_type: bart-large-cnn
 pretrained_model_name: ${upload_user}/${model_type}
 text_max_length: 1024
 
+quantization_type: origin
+quantization_config:
+  load_in_4bit: True
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: True
+  bnb_4bit_compute_dtype: bfloat16
+peft_type: origin
+peft_config:
+  r: 16
+  lora_alpha: 8
+  target_modules: all-linear
+  lora_dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+
 lr: 0.00002
 t_max: 50
 eta_min: 0.0000025
 
-monitor: val_rougeLsum_fmeasure
-tracking_direction: max
+monitor: val_loss
+tracking_direction: min
 patience: 3
 min_delta: 0
 
@@ -42,12 +57,12 @@ devices: 4
 accelerator: gpu
 strategy: ddp
 log_every_n_steps: 10
-precision: 32
+precision: 16
 accumulate_grad_batches: 1
 epoch: 100
 
 model_name: HuggingFace
-dataset_name: KaggleBBC
+dataset_name: UpStageDialogs
 mode: train
 
 is_tuned: tuned
