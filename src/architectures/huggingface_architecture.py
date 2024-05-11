@@ -40,7 +40,6 @@ class HuggingFaceArchitecture(LightningModule):
                 ROUGEScore(),
             ]
         )
-        self.val_metrics = metrics.clone(prefix="val_")
         self.test_metrics = metrics.clone(prefix="test_")
 
     def forward(
@@ -75,38 +74,13 @@ class HuggingFaceArchitecture(LightningModule):
             dim=-1,
         )
         loss = output.loss
-        if mode == "train":
-            return {
-                "loss": loss,
-                "logit": logit,
-                "pred": pred,
-                "label": label,
-                "index": index,
-            }
-        else:
-            generation = self.model.generate(
-                encoded=encoded,
-            )
-            decoded_generation = self.tokenizer.batch_decode(
-                sequences=generation,
-                skip_special_tokens=True,
-                clean_up_tokenization_spaces=False,
-            )
-            decoded_label = self.tokenizer.batch_decode(
-                sequences=label,
-                skip_special_tokens=True,
-                clean_up_tokenization_spaces=False,
-            )
-            return {
-                "loss": loss,
-                "logit": logit,
-                "pred": pred,
-                "generation": generation,
-                "decoded_generation": decoded_generation,
-                "label": label,
-                "decoded_label": decoded_label,
-                "index": index,
-            }
+        return {
+            "loss": loss,
+            "logit": logit,
+            "pred": pred,
+            "label": label,
+            "index": index,
+        }
 
     def configure_optimizers(self) -> Dict[str, Any]:
         if self.strategy == "deepspeed_stage_3":
@@ -177,14 +151,7 @@ class HuggingFaceArchitecture(LightningModule):
         )
         loss = output["loss"]
         pred = output["pred"]
-        generation = output["generation"]
-        decoded_generation = output["decoded_generation"]
         label = output["label"]
-        decoded_label = output["decoded_label"]
-        metrics = self.val_metrics(
-            decoded_generation,
-            decoded_label,
-        )
         self.log(
             "val_loss",
             loss,
@@ -193,20 +160,10 @@ class HuggingFaceArchitecture(LightningModule):
             prog_bar=False,
             sync_dist=True,
         )
-        self.log_dict(
-            metrics,
-            on_step=False,
-            on_epoch=True,
-            prog_bar=True,
-            sync_dist=False,
-        )
         return {
             "loss": loss,
             "pred": pred,
-            "generation": generation,
-            "decoded_generation": decoded_generation,
             "label": label,
-            "decoded_label": decoded_label,
         }
 
     def test_step(
@@ -220,10 +177,21 @@ class HuggingFaceArchitecture(LightningModule):
         )
         loss = output["loss"]
         pred = output["pred"]
-        generation = output["generation"]
-        decoded_generation = output["decoded_generation"]
         label = output["label"]
-        decoded_label = output["decoded_label"]
+        encoded = batch["encoded"]
+        generation = self.model.generate(
+            encoded=encoded,
+        )
+        decoded_generation = self.tokenizer.batch_decode(
+            sequences=generation,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False,
+        )
+        decoded_label = self.tokenizer.batch_decode(
+            sequences=label,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=False,
+        )
         metrics = self.test_metrics(
             decoded_generation,
             decoded_label,
@@ -276,7 +244,7 @@ class HuggingFaceArchitecture(LightningModule):
         pass
 
     def on_validation_epoch_end(self) -> None:
-        self.val_metrics.reset()
+        pass
 
     def on_test_epoch_end(self) -> None:
         self.test_metrics.reset()
