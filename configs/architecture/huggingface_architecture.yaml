@@ -1,0 +1,12 @@
+_target_: src.architectures.huggingface_architecture.HuggingFaceArchitecture
+
+model:
+  _target_: src.architectures.models.huggingface_model.HuggingFaceModel
+  pretrained_model_name: ${pretrained_model_name}
+
+pretrained_model_name: ${pretrained_model_name}
+strategy: ${strategy}
+lr: ${lr}
+t_max: ${t_max}
+eta_min: ${eta_min}
+interval: step

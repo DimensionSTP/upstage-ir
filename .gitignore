@@ -1,0 +1,17 @@
+*.ckpt
+*.csv
+*.mp4
+*.npy
+*.txt
+*.xml
+*.json
+*.ipynb
+*__pycache__
+logs/runs/
+logs/wandb/
+multirun/
+data/
+tmp*
+!requirements.txt
+!packages.txt
+*.out

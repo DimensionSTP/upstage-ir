@@ -1,0 +1,6 @@
+wandb:
+  _target_: lightning.pytorch.loggers.wandb.WandbLogger
+  project: ${project_name}
+  save_dir: ${project_dir}/logs
+  name: ${save_detail}-lr${lr}
+  offline: False # set True to store all logs only locally
