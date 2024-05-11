@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 
 
-class KaggleBBCDataset(Dataset):
+class UpStageDialogsDataset(Dataset):
     def __init__(
         self,
         data_path: str,
