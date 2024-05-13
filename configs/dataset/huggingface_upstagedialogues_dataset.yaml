@@ -1,7 +1,6 @@
 _target_: src.datasets.huggingface_dataset.UpStageDialoguesDataset
 data_path: ${connected_dir}/data
 split: ${split.train}
-split_ratio: ${split_ratio}
 seed: ${seed}
 target_column_name: ${target_column_name}
 num_devices: ${devices}
