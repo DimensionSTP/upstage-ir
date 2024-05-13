@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: huggingface_upstagedialogs_dataset
+  - dataset: huggingface_upstagedialogues_dataset
   - architecture: huggingface_architecture
   - tuner: huggingface_tuner
   - logger: wandb
