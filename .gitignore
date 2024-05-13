@@ -15,3 +15,4 @@ tmp*
 !requirements.txt
 !packages.txt
 *.out
+baseline*
