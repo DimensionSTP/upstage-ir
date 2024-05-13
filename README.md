@@ -3,7 +3,7 @@
 ## For Upstage NLP competition
 
 ### Dataset
-Upstage NLP competition dataset(dialog summarization)
+Upstage NLP competition dataset(dialogue summarization)
 
 ### Quick setup
 
