@@ -22,7 +22,7 @@ class HuggingFaceArchitecture(LightningModule):
         t_max: int,
         eta_min: float,
         interval: str,
-        generation_max_length: int,
+        options: Dict[str, Any],
     ) -> None:
         super().__init__()
         self.model = model
@@ -35,7 +35,7 @@ class HuggingFaceArchitecture(LightningModule):
         self.t_max = t_max
         self.eta_min = eta_min
         self.interval = interval
-        self.generation_max_length = generation_max_length
+        self.options = options
 
         metrics = MetricCollection(
             [
@@ -232,7 +232,7 @@ class HuggingFaceArchitecture(LightningModule):
         index = index.tolist()
         generation = self.model.generate(
             encoded=encoded,
-            max_length=self.generation_max_length,
+            options=self.options,
         )
         decoded_generation = self.tokenizer.batch_decode(
             sequences=generation,

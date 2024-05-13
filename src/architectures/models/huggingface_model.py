@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any
 
 import torch
 from torch import nn
@@ -69,9 +69,12 @@ class HuggingFaceModel(nn.Module):
     def generate(
         self,
         encoded: Dict[str, torch.Tensor],
+        options: Dict[str, Any],
     ) -> torch.Tensor:
         output = self.model.generate(
-            input_ids=encoded["input_ids"],
-            attention_mask=encoded["attention_mask"],
+            **{
+                **encoded,
+                **options,
+            }
         )
         return output

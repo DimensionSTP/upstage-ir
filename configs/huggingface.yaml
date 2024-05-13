@@ -36,8 +36,8 @@ quantization_config:
   bnb_4bit_compute_dtype: bfloat16
 peft_type: origin
 peft_config:
-  r: 16
-  lora_alpha: 8
+  r: 8
+  lora_alpha: 16
   target_modules: all-linear
   lora_dropout: 0.05
   bias: none
@@ -46,7 +46,8 @@ peft_config:
 lr: 0.00002
 t_max: 50
 eta_min: 0.0000025
-generation_max_length: 512
+options:
+  generation_max_length: 512
 
 monitor: val_loss
 tracking_direction: min
@@ -77,8 +78,8 @@ resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
 
 submission_file_name: test
-logit_name: ${save_detail}-epoch${epoch}-generation_max_length${generation_max_length}
-submission_name: ${save_detail}-epoch${epoch}-generation_max_length${generation_max_length}
+logit_name: ${save_detail}-epoch${epoch}-generation_max_length${options.generation_max_length}
+submission_name: ${save_detail}-epoch${epoch}-generation_max_length${options.generation_max_length}
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
