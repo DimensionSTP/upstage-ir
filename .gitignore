@@ -11,8 +11,8 @@ logs/runs/
 logs/wandb/
 multirun/
 data/
+baseline/
 tmp*
 !requirements.txt
 !packages.txt
 *.out
-baseline*
