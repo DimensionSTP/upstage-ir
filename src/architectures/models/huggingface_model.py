@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import os
 
 import torch
 from torch import nn
@@ -25,8 +26,12 @@ class HuggingFaceModel(nn.Module):
         super().__init__()
         if quantization_type == "quantization":
             self.quantization_config = quantization_config
+            self.device_map = {
+                "": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))
+            }
         elif quantization_type == "origin":
             self.quantization_config = None
+            self.device_map = None
         else:
             raise ValueError(f"Invalid quantization type: {quantization_type}.")
 
@@ -35,20 +40,24 @@ class HuggingFaceModel(nn.Module):
                 pretrained_model_name,
                 output_hidden_states=False,
                 quantization_config=self.quantization_config,
+                device_map=self.device_map,
             )
         elif "t5" in pretrained_model_name:
             model = T5ForConditionalGeneration.from_pretrained(
                 pretrained_model_name,
                 output_hidden_states=False,
                 quantization_config=self.quantization_config,
+                device_map=self.device_map,
             )
         else:
             model = AutoModelForCausalLM.from_pretrained(
                 pretrained_model_name,
                 output_hidden_states=False,
                 quantization_config=self.quantization_config,
+                device_map=self.device_map,
             )
 
+        model.gradient_checkpointing_enable()
         if quantization_type == "quantization":
             model = prepare_model_for_kbit_training(model)
 
