@@ -48,6 +48,38 @@ python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epo
 python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
 ```
 
+### Additional Options
+
+* for llama based model
+```shell
+is_llama={True or False} 
+```
+
+* pure decoder based LLM QLoRA 4-bit quantization option
+```shell
+quantization_type={origin or quantization} 
+```
+
+* pure decoder based LLM LoRA or QLoRA PEFT option
+```shell
+peft_type={origin or lora}
+```
+
+* for LLM fine-tuning in multi-GPU, recommended
+```shell
+strategy={deepspeed_stage_3 or deepspeed_stage_3_offload}
+```
+
+* upload user name at HuggingFace Model card
+```shell
+upload_user={upload_user} 
+```
+
+* Model name at HuggingFace Model card
+```shell
+model_type={model_type}
+```
+
 
 __If you want to change main config, use --config-name={config_name}.__
 
