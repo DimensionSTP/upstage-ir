@@ -122,6 +122,7 @@ class HuggingFaceTuner:
             eta_min=params["eta_min"],
             interval=self.module_params.interval,
             options=self.module_params.options,
+            target_max_length=self.module_params.target_max_length,
         )
 
         self.logger.log_hyperparams(params)

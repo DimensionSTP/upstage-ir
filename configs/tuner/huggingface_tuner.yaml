@@ -33,6 +33,7 @@ module_params:
   average: macro
   interval: step
   options: ${options}
+  target_max_length: ${target_max_length}
   devices: ${devices}
   accelerator: ${accelerator}
   strategy: ${strategy}
