@@ -16,8 +16,23 @@ hparams:
     log: False
 
 module_params:
+  quantization_type: ${quantization_type}
+  quantization_config:
+    load_in_4bit: ${quantization_config.load_in_4bit}
+    bnb_4bit_quant_type: ${quantization_config.bnb_4bit_quant_type}
+    bnb_4bit_use_double_quant: ${quantization_config.bnb_4bit_use_double_quant}
+    bnb_4bit_compute_dtype: ${quantization_config.bnb_4bit_compute_dtype}
+  peft_type: ${peft_type}
+  peft_config:
+    r: ${peft_config.r}
+    lora_alpha: ${peft_config.lora_alpha}
+    target_modules: ${peft_config.target_modules}
+    lora_dropout: ${peft_config.lora_dropout}
+    bias: ${peft_config.bias}
+    task_type: ${peft_config.task_type}
   average: macro
   interval: step
+  options: ${options}
   devices: ${devices}
   accelerator: ${accelerator}
   strategy: ${strategy}
