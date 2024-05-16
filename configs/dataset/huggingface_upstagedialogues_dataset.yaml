@@ -6,4 +6,5 @@ target_column_name: ${target_column_name}
 num_devices: ${devices}
 batch_size: ${batch_size}
 pretrained_model_name: ${pretrained_model_name}
-text_max_length: ${text_max_length}
+data_max_length: ${data_max_length}
+target_max_length: ${target_max_length}
