@@ -20,13 +20,14 @@ split:
   test: test
   predict: predict
 
-batch_size: 6
+batch_size: 4
 
 target_column_name: summary
 upload_user: facebook
 model_type: bart-large-cnn
 pretrained_model_name: ${upload_user}/${model_type}
-text_max_length: 1024
+data_max_length: 4096
+target_max_length: 150
 
 quantization_type: origin
 quantization_config:
@@ -47,7 +48,6 @@ lr: 0.00002
 t_max: 50
 eta_min: 0.0000025
 options:
-  max_length: 150
   no_repeat_ngram_size: 2
 
 monitor: val_loss
@@ -74,13 +74,14 @@ tuned_hparams_path: ${hparams_save_path}/best_params.json
 
 project_name: ${model_name}-${dataset_name}-${mode}
 total_batch_size: bs=${batch_size}x${devices}x${accumulate_grad_batches}
-save_detail: ${upload_user}_${model_type}-quantization_type=${quantization_type}-peft_type=${peft_type}-text_max_length=${text_max_length}-precision=${precision}-${total_batch_size}
+length_info: data_max_length=${data_max_length}-target_max_length=${target_max_length}
+save_detail: ${upload_user}_${model_type}-quantization_type=${quantization_type}-${length_info}-precision=${precision}-${total_batch_size}
 resumed_step: 0
-ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch${epoch}.ckpt
+ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch=${epoch}.ckpt
 
 submission_file_name: test
-logit_name: ${save_detail}-epoch${epoch}-generation_max_length${options.max_length}
-submission_name: ${save_detail}-epoch${epoch}-generation_max_length${options.max_length}
+logit_name: ${save_detail}-epoch=${epoch}
+submission_name: ${save_detail}-epoch=${epoch}
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
