@@ -21,7 +21,6 @@ model:
     task_type: ${peft_config.task_type}
 
 pretrained_model_name: ${pretrained_model_name}
-is_llama: ${is_llama}
 strategy: ${strategy}
 lr: ${lr}
 t_max: ${t_max}

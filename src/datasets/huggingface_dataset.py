@@ -18,7 +18,6 @@ class UpStageDialoguesDataset(Dataset):
         num_devices: int,
         batch_size: int,
         pretrained_model_name: str,
-        is_llama: bool,
         text_max_length: int,
     ) -> None:
         self.data_path = data_path
@@ -31,9 +30,8 @@ class UpStageDialoguesDataset(Dataset):
             pretrained_model_name,
             use_fast=True,
         )
-        if is_llama:
-            self.data_encoder.pad_token = "[PAD]"
-            self.data_encoder.padding_side = "left"
+        if self.data_encoder.pad_token_id is None:
+            self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         dataset = self.get_dataset()
         self.datas = dataset["datas"]
         self.labels = dataset["labels"]

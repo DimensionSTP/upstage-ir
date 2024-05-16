@@ -17,7 +17,6 @@ class HuggingFaceArchitecture(LightningModule):
         self,
         model: nn.Module,
         pretrained_model_name: str,
-        is_llama: bool,
         strategy: str,
         lr: float,
         t_max: int,
@@ -31,9 +30,8 @@ class HuggingFaceArchitecture(LightningModule):
             pretrained_model_name,
             use_fast=True,
         )
-        if is_llama:
-            self.tokenizer.pad_token = "[PAD]"
-            self.tokenizer.padding_side = "left"
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         self.strategy = strategy
         self.lr = lr
         self.t_max = t_max

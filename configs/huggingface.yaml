@@ -26,7 +26,6 @@ target_column_name: summary
 upload_user: facebook
 model_type: bart-large-cnn
 pretrained_model_name: ${upload_user}/${model_type}
-is_llama: False
 text_max_length: 1024
 
 quantization_type: origin
