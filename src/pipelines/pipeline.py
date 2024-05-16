@@ -231,7 +231,6 @@ def predict(
 
     trainer: Trainer = instantiate(
         config.trainer,
-        strategy="auto",
         devices=1,
         callbacks=callbacks,
         logger=logger,
