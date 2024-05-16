@@ -3,6 +3,7 @@ _target_: src.architectures.huggingface_architecture.HuggingFaceArchitecture
 model:
   _target_: src.architectures.models.huggingface_model.HuggingFaceModel
   pretrained_model_name: ${pretrained_model_name}
+  precision: ${precision}
   quantization_type: ${quantization_type}
   quantization_config:
     _target_: transformers.BitsAndBytesConfig
