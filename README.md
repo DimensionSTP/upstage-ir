@@ -50,11 +50,6 @@ python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} 
 
 ### Additional Options
 
-* for llama based model
-```shell
-is_llama={True or False} 
-```
-
 * pure decoder based LLM QLoRA 4-bit quantization option
 ```shell
 quantization_type={origin or quantization} 
@@ -67,17 +62,19 @@ peft_type={origin or lora}
 
 * for LLM fine-tuning in multi-GPU, recommended
 ```shell
-strategy={deepspeed_stage_3 or deepspeed_stage_3_offload}
+strategy={deepspeed_stage_2 or deepspeed_stage_2_offload}
 ```
 
-* upload user name at HuggingFace Model card
+* upload user name and model name at HuggingFace Model card
 ```shell
 upload_user={upload_user} 
+model_type={model_type}
 ```
 
-* Model name at HuggingFace Model card
+* Set data and target max lengt for model training and generation
 ```shell
-model_type={model_type}
+data_max_length={data_max_length} 
+target_max_length={target_max_length} 
 ```
 
 
