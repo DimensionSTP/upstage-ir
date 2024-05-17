@@ -31,6 +31,7 @@ docker-pycreds==0.4.0
 einops==0.7.0
 fairseq==0.12.2
 filelock==3.13.1
+flash-attn==2.5.8
 flatbuffers==23.5.26
 fonttools==4.48.1
 frozenlist==1.4.1
@@ -106,6 +107,7 @@ pynvml==11.5.0
 pyparsing==3.1.1
 pytesseract==0.3.10
 python-dateutil==2.8.2
+python-dotenv==1.0.1
 pytorch-lightning==2.2.0
 pytz==2024.1
 PyWavelets==1.4.1
