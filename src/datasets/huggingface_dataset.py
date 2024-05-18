@@ -56,6 +56,7 @@ class UpStageDialoguesDataset(Dataset):
                 data=self.labels[idx],
                 data_type="target",
             )["input_ids"]
+            encoded["labels"] = label
         else:
             prompt = self.generate_prompt(
                 data=self.datas[idx],
@@ -65,8 +66,6 @@ class UpStageDialoguesDataset(Dataset):
                 data=prompt,
                 data_type="data",
             )
-            label = encoded["input_ids"]
-        encoded["labels"] = label
         if "token_type_ids" in encoded.keys():
             del encoded["token_type_ids"]
         return {
