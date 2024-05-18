@@ -27,8 +27,9 @@ class HuggingFaceArchitecture(LightningModule):
     ) -> None:
         super().__init__()
         self.model = model
+        self.pretrained_model_name = pretrained_model_name
         self.tokenizer = AutoTokenizer.from_pretrained(
-            pretrained_model_name,
+            self.pretrained_model_name,
             use_fast=True,
         )
         if self.tokenizer.pad_token_id is None:
@@ -68,6 +69,11 @@ class HuggingFaceArchitecture(LightningModule):
         mode: str,
     ) -> Dict[str, torch.Tensor]:
         encoded = batch["encoded"]
+        if (
+            "bart" not in self.pretrained_model_name
+            and "t5" not in self.pretrained_model_name
+        ):
+            encoded["labels"] = encoded["input_ids"]
         label = encoded["labels"]
         index = batch["index"]
         output = self(
