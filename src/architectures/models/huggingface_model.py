@@ -21,24 +21,22 @@ class HuggingFaceModel(nn.Module):
     ) -> None:
         super().__init__()
         self.pretrained_model_name = pretrained_model_name
+        self.attn_implementation = None
+        self.quantization_config = None
+        self.device_map = None
+
         if precision == 32 or precision == "32":
             self.precision = torch.float32
-            self.attn_implementation = None
         elif precision == 16 or precision == "16":
             self.precision = torch.float16
-            if "t5" in self.pretrained_model_name:
-                self.attn_implementation = None
-            else:
+            if "t5" not in self.pretrained_model_name:
                 self.attn_implementation = "flash_attention_2"
         elif precision == "bf16":
             self.precision = torch.bfloat16
-            if "t5" in self.pretrained_model_name:
-                self.attn_implementation = None
-            else:
+            if "t5" not in self.pretrained_model_name:
                 self.attn_implementation = "flash_attention_2"
         else:
             self.precision = "auto"
-            self.attn_implementation = None
 
         if quantization_type == "quantization":
             self.quantization_config = quantization_config
@@ -46,12 +44,7 @@ class HuggingFaceModel(nn.Module):
             self.device_map = {
                 "": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))
             }
-            self.load_in_4bit = True
-        elif quantization_type == "origin":
-            self.quantization_config = None
-            self.device_map = None
-            self.load_in_4bit = False
-        else:
+        if quantization_type not in ["origin", "quantization"]:
             raise ValueError(f"Invalid quantization type: {quantization_type}.")
 
         if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
@@ -62,7 +55,6 @@ class HuggingFaceModel(nn.Module):
                 attn_implementation=self.attn_implementation,
                 quantization_config=self.quantization_config,
                 device_map=self.device_map,
-                load_in_4bit=self.load_in_4bit,
             )
         else:
             model = AutoModelForCausalLM.from_pretrained(
@@ -72,7 +64,6 @@ class HuggingFaceModel(nn.Module):
                 attn_implementation=self.attn_implementation,
                 quantization_config=self.quantization_config,
                 device_map=self.device_map,
-                load_in_4bit=self.load_in_4bit,
             )
 
         model.gradient_checkpointing_enable(
