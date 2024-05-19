@@ -106,6 +106,7 @@ class HuggingFaceTuner:
         model = HuggingFaceModel(
             pretrained_model_name=params["pretrained_model_name"],
             precision=self.module_params.precision,
+            mode=self.module_params.mode,
             quantization_type=self.module_params.quantization_type,
             quantization_config=BitsAndBytesConfig(
                 **self.module_params.quantization_config
@@ -123,6 +124,8 @@ class HuggingFaceTuner:
             interval=self.module_params.interval,
             options=self.module_params.options,
             target_max_length=self.module_params.target_max_length,
+            per_device_save_path=self.module_params.per_device_save_path,
+            target_column_name=self.module_params.target_column_name,
         )
 
         self.logger.log_hyperparams(params)

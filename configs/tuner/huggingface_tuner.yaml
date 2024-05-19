@@ -16,6 +16,7 @@ hparams:
     log: False
 
 module_params:
+  mode: ${mode}
   quantization_type: ${quantization_type}
   quantization_config:
     load_in_4bit: ${quantization_config.load_in_4bit}
@@ -34,6 +35,8 @@ module_params:
   interval: step
   options: ${options}
   target_max_length: ${target_max_length}
+  per_device_save_path: ${per_device_save_path}
+  target_column_name: ${target_column_name}
   devices: ${devices}
   accelerator: ${accelerator}
   strategy: ${strategy}
