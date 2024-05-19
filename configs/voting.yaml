@@ -1,0 +1,15 @@
+defaults:
+  - hydra: hydra
+
+run_name: soft_voting
+work_dir: ${hydra:runtime.cwd}
+
+basic_path: /data/upstage-nlp
+voted_name: soft_voting
+
+voted_logit: ${basic_path}/logits/${voted_name}.npy
+voted_prediction: ${basic_path}/preds/${voted_name}.csv
+
+votings:
+  logit1: 0.5
+  logit2: 0.5
