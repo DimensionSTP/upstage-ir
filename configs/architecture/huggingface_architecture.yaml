@@ -30,5 +30,6 @@ eta_min: ${eta_min}
 interval: step
 options: ${options}
 target_max_length: ${target_max_length}
+target_min_length: ${target_min_length}
 per_device_save_path: ${per_device_save_path}
 target_column_name: ${target_column_name}

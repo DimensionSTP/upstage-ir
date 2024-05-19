@@ -78,11 +78,13 @@ class HuggingFaceModel(nn.Module):
         encoded: Dict[str, torch.Tensor],
         options: Dict[str, Any],
         target_max_length: int,
+        target_min_length: int,
     ) -> torch.Tensor:
         if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
             options["max_length"] = target_max_length
         else:
             options["max_new_tokens"] = target_max_length
+            options["min_new_tokens"] = target_max_length
         output = self.model.generate(
             **{
                 **encoded,

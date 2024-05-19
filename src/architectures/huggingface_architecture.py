@@ -27,6 +27,7 @@ class HuggingFaceArchitecture(LightningModule):
         interval: str,
         options: Dict[str, Any],
         target_max_length: int,
+        target_min_length: int,
         per_device_save_path: str,
         target_column_name: str,
     ) -> None:
@@ -46,6 +47,7 @@ class HuggingFaceArchitecture(LightningModule):
         self.interval = interval
         self.options = options
         self.target_max_length = target_max_length
+        self.target_min_length = target_min_length
         self.per_device_save_path = per_device_save_path
         self.target_column_name = target_column_name
 
@@ -252,6 +254,7 @@ class HuggingFaceArchitecture(LightningModule):
             encoded=encoded,
             options=self.options,
             target_max_length=self.target_max_length,
+            target_min_length=self.target_min_length,
         )
         if (
             "bart" not in self.pretrained_model_name

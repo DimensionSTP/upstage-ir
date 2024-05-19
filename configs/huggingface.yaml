@@ -28,6 +28,7 @@ model_type: bart-large-cnn
 pretrained_model_name: ${upload_user}/${model_type}
 data_max_length: 4096
 target_max_length: 150
+target_min_length: 100
 
 quantization_type: origin
 quantization_config:
