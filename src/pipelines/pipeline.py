@@ -267,37 +267,6 @@ def predict(
         )
         raise e
 
-    pred_dfs = []
-    for per_device_file_name in os.listdir(config.per_device_save_path):
-        if per_device_file_name.endswith(".csv"):
-            per_device_pred_df = pd.read_csv(
-                f"{config.per_device_save_path}/{per_device_file_name}"
-            )
-            per_device_pred_df.fillna("_")
-            pred_dfs.append(per_device_pred_df)
-    combined_pred_df = pd.concat(pred_dfs)
-    sorted_pred_df = combined_pred_df.sort_values(by="index")
-    all_predictions = sorted_pred_df[config.target_column_name]
-    pred_df = pd.read_csv(
-        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
-    )
-    if len(all_predictions) < len(pred_df):
-        raise ValueError(
-            f"Length of all_predictions {len(all_predictions)} is shorter than length of predict data {len(pred_df)}."
-        )
-    if len(all_predictions) > len(pred_df):
-        all_predictions = all_predictions[: len(pred_df)]
-    pred_df[config.target_column_name] = all_predictions
-    if not os.path.exists(f"{config.connected_dir}/submissions"):
-        os.makedirs(
-            f"{config.connected_dir}/submissions",
-            exist_ok=True,
-        )
-    pred_df.to_csv(
-        f"{config.connected_dir}/submissions/{config.submission_name}.csv",
-        index=False,
-    )
-
 
 def tune(
     config: DictConfig,
