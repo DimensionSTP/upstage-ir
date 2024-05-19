@@ -1,4 +1,7 @@
 from typing import Dict, Any
+import os
+
+import pandas as pd
 
 import torch
 from torch import optim, nn
@@ -24,6 +27,8 @@ class HuggingFaceArchitecture(LightningModule):
         interval: str,
         options: Dict[str, Any],
         target_max_length: int,
+        per_device_save_path: str,
+        target_column_name: str,
     ) -> None:
         super().__init__()
         self.model = model
@@ -41,6 +46,8 @@ class HuggingFaceArchitecture(LightningModule):
         self.interval = interval
         self.options = options
         self.target_max_length = target_max_length
+        self.per_device_save_path = per_device_save_path
+        self.target_column_name = target_column_name
 
         metrics = MetricCollection(
             [
@@ -240,19 +247,41 @@ class HuggingFaceArchitecture(LightningModule):
         encoded = batch["encoded"]
         index = batch["index"]
         index = index.tolist()
+        self.model.eval()
         generation = self.model.generate(
             encoded=encoded,
             options=self.options,
             target_max_length=self.target_max_length,
         )
+        if (
+            "bart" not in self.pretrained_model_name
+            and "t5" not in self.pretrained_model_name
+        ):
+            input_length = len(encoded["input_ids"][0])
+            generation = generation[:, input_length:]
         decoded_generation = self.tokenizer.batch_decode(
             sequences=generation,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
         )
         output = {index[i]: decoded_generation[i] for i in range(len(index))}
-        gathered_output = self.all_gather(output)
-        return gathered_output
+        device_num = self.device.index if self.device.index is not None else 0
+        if not os.path.exists(f"{self.per_device_save_path}"):
+            os.makedirs(
+                f"{self.per_device_save_path}",
+                exist_ok=True,
+            )
+        csv_file = f"{self.per_device_save_path}/device_num_{device_num}.csv"
+        df = pd.DataFrame(
+            {
+                "index": output.keys(),
+                self.target_column_name: output.values(),
+            }
+        )
+        if os.path.exists(csv_file):
+            df.to_csv(csv_file, mode="a", header=False, index=False)
+        else:
+            df.to_csv(csv_file, mode="w", header=True, index=False)
 
     def on_train_epoch_end(self) -> None:
         pass
