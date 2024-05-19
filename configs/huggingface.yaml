@@ -80,7 +80,7 @@ resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/epoch=${epoch}.ckpt
 
 submission_file_name: test
-per_device_save_path: ${connected_dir}/sharded_result/${save_detail}
+logit_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
 run_name: ${project_name}

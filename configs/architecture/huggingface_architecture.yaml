@@ -4,7 +4,6 @@ model:
   _target_: src.architectures.models.huggingface_model.HuggingFaceModel
   pretrained_model_name: ${pretrained_model_name}
   precision: ${precision}
-  mode: ${mode}
   quantization_type: ${quantization_type}
   quantization_config:
     _target_: transformers.BitsAndBytesConfig
@@ -30,5 +29,3 @@ eta_min: ${eta_min}
 interval: step
 options: ${options}
 target_max_length: ${target_max_length}
-per_device_save_path: ${per_device_save_path}
-target_column_name: ${target_column_name}
