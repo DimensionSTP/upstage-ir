@@ -262,7 +262,7 @@ class HuggingFaceArchitecture(LightningModule):
         decoded_generation = self.tokenizer.batch_decode(
             sequences=generation,
             skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
+            clean_up_tokenization_spaces=True,
         )
         output = {index[i]: decoded_generation[i] for i in range(len(index))}
         device_num = self.device.index if self.device.index is not None else 0
