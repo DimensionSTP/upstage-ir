@@ -106,7 +106,7 @@ class HuggingFaceTuner:
         model = HuggingFaceModel(
             pretrained_model_name=params["pretrained_model_name"],
             precision=self.module_params.precision,
-            mode=self.module_params.mode,
+            mode=self.module_params.model_execution_mode,
             quantization_type=self.module_params.quantization_type,
             quantization_config=BitsAndBytesConfig(
                 **self.module_params.quantization_config

@@ -16,7 +16,7 @@ hparams:
     log: False
 
 module_params:
-  mode: ${mode}
+  model_execution_mode: ${mode}
   quantization_type: ${quantization_type}
   quantization_config:
     load_in_4bit: ${quantization_config.load_in_4bit}
