@@ -43,6 +43,7 @@ peft_config:
   lora_dropout: 0.05
   bias: none
   task_type: CAUSAL_LM
+  inference_mode: False
 
 lr: 0.00002
 t_max: 50
