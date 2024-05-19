@@ -1,12 +1,15 @@
 from typing import Dict, Any
 import os
 
+import numpy as np
 import pandas as pd
 
 import torch
 from torch import optim, nn
 from torchmetrics import MetricCollection
 from torchmetrics.text.rouge import ROUGEScore
+
+from einops import repeat
 
 from lightning.pytorch import LightningModule
 
@@ -246,10 +249,53 @@ class HuggingFaceArchitecture(LightningModule):
         batch: Dict[str, Any],
         batch_idx: int,
     ) -> torch.Tensor:
+        output = self.step(
+            batch=batch,
+            mode="eval",
+        )
+        logit = output["logit"]
+        if len(logit[0].shape) < 3:
+            logit = logit.unsqueeze(0)
         encoded = batch["encoded"]
         index = batch["index"]
-        index = index.tolist()
-        self.model.eval()
+        index_expanded = repeat(
+            index,
+            "batch_size -> batch_size target_max_length 1",
+            target_max_length=self.target_max_length,
+        )
+        index_list = index.tolist()
+        logit_with_index = torch.cat(
+            (
+                logit,
+                index_expanded,
+            ),
+            dim=-1,
+        ).numpy()
+        if not os.path.exists(f"{self.per_device_save_path}"):
+            os.makedirs(
+                f"{self.per_device_save_path}",
+                exist_ok=True,
+            )
+        npy_file = f"{self.per_device_save_path}/device_num_{device_num}.npy"
+        if not os.path.exists(npy_file):
+            np.save(
+                npy_file,
+                logit_with_index,
+            )
+        else:
+            saved_logit_with_index = np.load(npy_file)
+            concatenated_logit_with_index = np.concatenate(
+                (
+                    saved_logit_with_index,
+                    logit_with_index,
+                ),
+                axis=-1,
+            )
+            np.save(
+                npy_file,
+                concatenated_logit_with_index,
+            )
+
         generation = self.model.generate(
             encoded=encoded,
             options=self.options,
@@ -267,13 +313,8 @@ class HuggingFaceArchitecture(LightningModule):
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True,
         )
-        output = {index[i]: decoded_generation[i] for i in range(len(index))}
+        output = {index_list[i]: decoded_generation[i] for i in range(len(index_list))}
         device_num = self.device.index if self.device.index is not None else 0
-        if not os.path.exists(f"{self.per_device_save_path}"):
-            os.makedirs(
-                f"{self.per_device_save_path}",
-                exist_ok=True,
-            )
         csv_file = f"{self.per_device_save_path}/device_num_{device_num}.csv"
         df = pd.DataFrame(
             {
@@ -281,10 +322,20 @@ class HuggingFaceArchitecture(LightningModule):
                 self.target_column_name: output.values(),
             }
         )
-        if os.path.exists(csv_file):
-            df.to_csv(csv_file, mode="a", header=False, index=False)
+        if not os.path.exists(csv_file):
+            df.to_csv(
+                csv_file,
+                mode="w",
+                header=True,
+                index=False,
+            )
         else:
-            df.to_csv(csv_file, mode="w", header=True, index=False)
+            df.to_csv(
+                csv_file,
+                mode="a",
+                header=False,
+                index=False,
+            )
 
     def on_train_epoch_end(self) -> None:
         pass
