@@ -233,6 +233,7 @@ def predict(
 
     trainer: Trainer = instantiate(
         config.trainer,
+        devices=1,
         callbacks=callbacks,
         logger=logger,
         _convert_="partial",
@@ -243,13 +244,13 @@ def predict(
             config.strategy == "deepspeed_stage_3"
             or config.strategy == "deepspeed_stage_3_offload"
         ):
-            trainer.predict(
+            preds = trainer.predict(
                 model=architecture,
                 dataloaders=predict_loader,
                 ckpt_path=f"{config.ckpt_path}/model.pt",
             )
         else:
-            trainer.predict(
+            preds = trainer.predict(
                 model=architecture,
                 dataloaders=predict_loader,
                 ckpt_path=config.ckpt_path,
@@ -267,20 +268,13 @@ def predict(
         )
         raise e
 
-    pred_dfs = []
-    for per_device_file_name in os.listdir(config.per_device_save_path):
-        if per_device_file_name.endswith(".csv"):
-            per_device_pred_df = pd.read_csv(
-                f"{config.per_device_save_path}/{per_device_file_name}"
-            )
-            per_device_pred_df.fillna("_")
-            pred_dfs.append(per_device_pred_df)
-    combined_pred_df = pd.concat(
-        pred_dfs,
-        ignore_index=True,
-    )
-    sorted_pred_df = combined_pred_df.sort_values(by="index")
-    all_predictions = sorted_pred_df[config.target_column_name]
+    all_predictions_with_indices = {}
+    for pred in preds:
+        all_predictions_with_indices.update(pred)
+    all_predictions = [
+        all_predictions_with_indices[key]
+        for key in sorted(all_predictions_with_indices.keys())
+    ]
     pred_df = pd.read_csv(
         f"{config.connected_dir}/data/{config.submission_file_name}.csv"
     )
