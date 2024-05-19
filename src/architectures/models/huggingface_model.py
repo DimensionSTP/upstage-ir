@@ -4,7 +4,12 @@ import os
 import torch
 from torch import nn
 
-from transformers import BitsAndBytesConfig, AutoModelForSeq2SeqLM, AutoModelForCausalLM
+from transformers import (
+    BitsAndBytesConfig,
+    PreTrainedModel,
+    AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,
+)
 
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
 
@@ -21,8 +26,11 @@ class HuggingFaceModel(nn.Module):
     ) -> None:
         super().__init__()
         self.pretrained_model_name = pretrained_model_name
-        self.attn_implementation = None
+        self.quantization_type = quantization_type
         self.quantization_config = None
+        self.peft_type = peft_type
+        self.peft_config = peft_config
+        self.attn_implementation = None
         self.device_map = None
 
         if precision == 32 or precision == "32":
@@ -38,49 +46,16 @@ class HuggingFaceModel(nn.Module):
         else:
             self.precision = "auto"
 
-        if quantization_type == "quantization":
+        if self.quantization_type == "quantization":
             self.quantization_config = quantization_config
             self.quantization_config.bnb_4bit_compute_dtype = self.precision
             self.device_map = {
                 "": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))
             }
-        if quantization_type not in ["origin", "quantization"]:
-            raise ValueError(f"Invalid quantization type: {quantization_type}.")
+        if self.quantization_type not in ["origin", "quantization"]:
+            raise ValueError(f"Invalid quantization type: {self.quantization_type}.")
 
-        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
-            model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.pretrained_model_name,
-                output_hidden_states=False,
-                torch_dtype=self.precision,
-                attn_implementation=self.attn_implementation,
-                quantization_config=self.quantization_config,
-                device_map=self.device_map,
-            )
-        else:
-            model = AutoModelForCausalLM.from_pretrained(
-                self.pretrained_model_name,
-                output_hidden_states=False,
-                torch_dtype=self.precision,
-                attn_implementation=self.attn_implementation,
-                quantization_config=self.quantization_config,
-                device_map=self.device_map,
-            )
-
-        model.gradient_checkpointing_enable(
-            gradient_checkpointing_kwargs={
-                "use_reentrant": False,
-            }
-        )
-        if quantization_type == "quantization":
-            model = prepare_model_for_kbit_training(model)
-
-        if peft_type == "lora":
-            model.enable_input_require_grads()
-            self.model = get_peft_model(model, peft_config)
-        elif peft_type == "origin":
-            self.model = model
-        else:
-            raise ValueError(f"Invalid PEFT type: {peft_type}.")
+        self.model = self.get_model()
 
     def forward(
         self,
@@ -106,3 +81,39 @@ class HuggingFaceModel(nn.Module):
             }
         )
         return output
+
+    def get_model(self) -> PreTrainedModel:
+        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
+            model = AutoModelForSeq2SeqLM.from_pretrained(
+                self.pretrained_model_name,
+                output_hidden_states=False,
+                torch_dtype=self.precision,
+                attn_implementation=self.attn_implementation,
+                quantization_config=self.quantization_config,
+                device_map=self.device_map,
+            )
+        else:
+            model = AutoModelForCausalLM.from_pretrained(
+                self.pretrained_model_name,
+                output_hidden_states=False,
+                torch_dtype=self.precision,
+                attn_implementation=self.attn_implementation,
+                quantization_config=self.quantization_config,
+                device_map=self.device_map,
+            )
+
+        model.gradient_checkpointing_enable(
+            gradient_checkpointing_kwargs={
+                "use_reentrant": False,
+            }
+        )
+
+        if self.quantization_type == "quantization":
+            model = prepare_model_for_kbit_training(model)
+
+        if self.peft_type == "lora":
+            model.enable_input_require_grads()
+            model = get_peft_model(model, self.peft_config)
+        if self.peft_type not in ["origin", "lora"]:
+            raise ValueError(f"Invalid PEFT type: {self.peft_type}.")
+        return model
