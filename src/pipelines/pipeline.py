@@ -244,13 +244,13 @@ def predict(
             config.strategy == "deepspeed_stage_3"
             or config.strategy == "deepspeed_stage_3_offload"
         ):
-            preds = trainer.predict(
+            trainer.predict(
                 model=architecture,
                 dataloaders=predict_loader,
                 ckpt_path=f"{config.ckpt_path}/model.pt",
             )
         else:
-            preds = trainer.predict(
+            trainer.predict(
                 model=architecture,
                 dataloaders=predict_loader,
                 ckpt_path=config.ckpt_path,
