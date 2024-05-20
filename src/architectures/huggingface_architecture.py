@@ -264,18 +264,23 @@ class HuggingFaceArchitecture(LightningModule):
             data_max_length=logit.size(dim=1),
         )
         index_list = index.tolist()
-        logit_with_index = torch.cat(
-            (
-                logit,
-                index_expanded,
-            ),
-            dim=-1,
-        ).numpy()
+        logit_with_index = (
+            torch.cat(
+                (
+                    logit,
+                    index_expanded,
+                ),
+                dim=-1,
+            )
+            .cpu()
+            .numpy()
+        )
         if not os.path.exists(f"{self.per_device_save_path}"):
             os.makedirs(
                 f"{self.per_device_save_path}",
                 exist_ok=True,
             )
+        device_num = self.device.index if self.device.index is not None else 0
         npy_file = f"{self.per_device_save_path}/device_num_{device_num}.npy"
         if not os.path.exists(npy_file):
             np.save(
@@ -314,7 +319,6 @@ class HuggingFaceArchitecture(LightningModule):
             clean_up_tokenization_spaces=True,
         )
         output = {index_list[i]: decoded_generation[i] for i in range(len(index_list))}
-        device_num = self.device.index if self.device.index is not None else 0
         csv_file = f"{self.per_device_save_path}/device_num_{device_num}.csv"
         df = pd.DataFrame(
             {
