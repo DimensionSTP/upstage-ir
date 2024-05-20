@@ -254,14 +254,14 @@ class HuggingFaceArchitecture(LightningModule):
             mode="eval",
         )
         logit = output["logit"]
-        if len(logit[0].shape) < 3:
+        if len(logit.shape) < 3:
             logit = logit.unsqueeze(0)
         encoded = batch["encoded"]
         index = batch["index"]
         index_expanded = repeat(
             index,
-            "batch_size -> batch_size target_max_length 1",
-            target_max_length=self.target_max_length,
+            "batch_size -> batch_size data_max_length 1",
+            data_max_length=logit.size(dim=1),
         )
         index_list = index.tolist()
         logit_with_index = torch.cat(
