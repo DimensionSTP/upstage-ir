@@ -18,17 +18,21 @@ from omegaconf import DictConfig
 def merge_predictions(
     config: DictConfig,
 ) -> None:
-    generation_dfs = []
     logits = []
-    for per_device_file_name in os.listdir(config.per_device_save_path):
+    for per_device_file_name in os.listdir(f"{config.per_device_save_path}/logits"):
         if per_device_file_name.endswith(".npy"):
             per_device_logit = np.load(
-                f"{config.per_device_save_path}/{per_device_file_name}"
+                f"{config.per_device_save_path}/logits/{per_device_file_name}"
             )
             logits.append(per_device_logit)
+
+    generation_dfs = []
+    for per_device_file_name in os.listdir(
+        f"{config.per_device_save_path}/generations"
+    ):
         if per_device_file_name.endswith(".csv"):
             per_device_generation_df = pd.read_csv(
-                f"{config.per_device_save_path}/{per_device_file_name}"
+                f"{config.per_device_save_path}/generations/{per_device_file_name}"
             )
             per_device_generation_df.fillna("_")
             generation_dfs.append(per_device_generation_df)
