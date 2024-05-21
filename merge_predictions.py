@@ -1,4 +1,5 @@
 import os
+import pickle
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
@@ -59,19 +60,27 @@ def merge_predictions(
             f"{config.connected_dir}/logits",
             exist_ok=True,
         )
-    np.save(
-        f"{config.connected_dir}/logits/{config.logit_name}.npy",
-        sorted_logits,
-    )
+    with open(
+        f"{config.connected_dir}/logits/{config.logit_name}.pickle",
+        "wb",
+    ) as f:
+        pickle.dump(
+            sorted_logits,
+            f,
+        )
     if not os.path.exists(f"{config.connected_dir}/preds"):
         os.makedirs(
             f"{config.connected_dir}/preds",
             exist_ok=True,
         )
-    np.save(
-        f"{config.connected_dir}/preds/{config.pred_name}.npy",
-        all_predictions,
-    )
+    with open(
+        f"{config.connected_dir}/preds/{config.pred_name}.pickle",
+        "wb",
+    ) as f:
+        pickle.dump(
+            all_predictions,
+            f,
+        )
 
     combined_generation_df = pd.concat(generation_dfs)
     sorted_generation_df = combined_generation_df.sort_values(by="index")

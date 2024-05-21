@@ -1,10 +1,10 @@
 import os
+import pickle
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
 warnings.filterwarnings("ignore")
 
-import numpy as np
 import pandas as pd
 
 from transformers import AutoTokenizer
@@ -34,7 +34,11 @@ def decode_predictions(
         """.strip()
         return prompt
 
-    all_predictions = np.load(f"{config.connected_dir}/preds/{config.pred_name}.npy")
+    with open(
+        f"{config.connected_dir}/preds/{config.pred_name}.pickle",
+        "rb",
+    ) as f:
+        all_predictions = pickle.load(f)
     generation_df = pd.read_csv(
         f"{config.connected_dir}/data/{config.submission_file_name}.csv"
     )
