@@ -294,7 +294,7 @@ class HuggingFaceArchitecture(LightningModule):
                     saved_logit_with_index,
                     logit_with_index,
                 ),
-                axis=-1,
+                axis=0,
             )
             np.save(
                 npy_file,
