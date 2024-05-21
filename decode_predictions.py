@@ -17,7 +17,7 @@ from omegaconf import DictConfig
     config_path="configs/",
     config_name="huggingface.yaml",
 )
-def merge_predictions(
+def decode_predictions(
     config: DictConfig,
 ) -> None:
     def generate_prompt(
@@ -75,4 +75,4 @@ def merge_predictions(
 
 
 if __name__ == "__main__":
-    merge_predictions()
+    decode_predictions()
