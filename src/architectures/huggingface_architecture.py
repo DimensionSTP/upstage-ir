@@ -275,32 +275,21 @@ class HuggingFaceArchitecture(LightningModule):
             .cpu()
             .numpy()
         )
-        if not os.path.exists(f"{self.per_device_save_path}"):
-            os.makedirs(
-                f"{self.per_device_save_path}",
-                exist_ok=True,
-            )
         device_num = self.device.index if self.device.index is not None else 0
         current_global_step = self.trainer.global_step
-        npy_file = f"{self.per_device_save_path}/logits/device_num={device_num}-global_step={current_global_step}.npy"
-        if not os.path.exists(npy_file):
+        if not os.path.exists(f"{self.per_device_save_path}/logits"):
+            os.makedirs(
+                f"{self.per_device_save_path}/logits",
+                exist_ok=True,
+            )
+        logit_file = f"{self.per_device_save_path}/logits/device_num={device_num}-global_step={current_global_step}.npy"
+        if not os.path.exists(logit_file):
             np.save(
-                npy_file,
+                logit_file,
                 logit_with_index,
             )
         else:
-            saved_logit_with_index = np.load(npy_file)
-            concatenated_logit_with_index = np.concatenate(
-                (
-                    saved_logit_with_index,
-                    logit_with_index,
-                ),
-                axis=0,
-            )
-            np.save(
-                npy_file,
-                concatenated_logit_with_index,
-            )
+            raise FileExistsError(f"{logit_file} already exists")
 
         generation = self.model.generate(
             encoded=encoded,
@@ -320,27 +309,27 @@ class HuggingFaceArchitecture(LightningModule):
             clean_up_tokenization_spaces=True,
         )
         output = {index_list[i]: decoded_generation[i] for i in range(len(index_list))}
-        csv_file = f"{self.per_device_save_path}/generations/device_num={device_num}-global_step={current_global_step}.csv"
+        if not os.path.exists(f"{self.per_device_save_path}/generations"):
+            os.makedirs(
+                f"{self.per_device_save_path}/generations",
+                exist_ok=True,
+            )
+        generation_file = f"{self.per_device_save_path}/generations/device_num={device_num}-global_step={current_global_step}.csv"
         df = pd.DataFrame(
             {
                 "index": output.keys(),
                 self.target_column_name: output.values(),
             }
         )
-        if not os.path.exists(csv_file):
+        if not os.path.exists(generation_file):
             df.to_csv(
-                csv_file,
+                generation_file,
                 mode="w",
                 header=True,
                 index=False,
             )
         else:
-            df.to_csv(
-                csv_file,
-                mode="a",
-                header=False,
-                index=False,
-            )
+            raise FileExistsError(f"{generation_file} already exists")
 
     def on_train_epoch_end(self) -> None:
         pass
