@@ -23,7 +23,7 @@ def decode_predictions(
     def generate_prompt(
         data: str,
     ) -> str:
-        default_system_prompt = "Summarize the dialogues of two people appropriately."
+        default_system_prompt = "너의 역할은 대화 내용을 요약해주는 요약 전문가야. 다음 사람들의 대화 내용을 보고 적절히 요약해줘."
         prompt = f"""### Instruction:
         {default_system_prompt} 
 
