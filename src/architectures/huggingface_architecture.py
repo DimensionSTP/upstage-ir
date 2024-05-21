@@ -281,7 +281,8 @@ class HuggingFaceArchitecture(LightningModule):
                 exist_ok=True,
             )
         device_num = self.device.index if self.device.index is not None else 0
-        npy_file = f"{self.per_device_save_path}/device_num_{device_num}.npy"
+        current_global_step = self.trainer.global_step
+        npy_file = f"{self.per_device_save_path}/logits/device_num={device_num}-global_step={current_global_step}.npy"
         if not os.path.exists(npy_file):
             np.save(
                 npy_file,
@@ -319,7 +320,7 @@ class HuggingFaceArchitecture(LightningModule):
             clean_up_tokenization_spaces=True,
         )
         output = {index_list[i]: decoded_generation[i] for i in range(len(index_list))}
-        csv_file = f"{self.per_device_save_path}/device_num_{device_num}.csv"
+        csv_file = f"{self.per_device_save_path}/generations/device_num={device_num}-global_step={current_global_step}.csv"
         df = pd.DataFrame(
             {
                 "index": output.keys(),
