@@ -307,7 +307,13 @@ class HuggingFaceArchitecture(LightningModule):
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True,
         )
-        output = {index_list[i]: decoded_generation[i] for i in range(len(index_list))}
+        cleaned_generation = list(
+            map(
+                lambda sentence: sentence.replace("\n", " ").replace("\r", " "),
+                decoded_generation,
+            )
+        )
+        output = {index_list[i]: cleaned_generation[i] for i in range(len(index_list))}
         if not os.path.exists(f"{self.per_device_save_path}/generations"):
             os.makedirs(
                 f"{self.per_device_save_path}/generations",
