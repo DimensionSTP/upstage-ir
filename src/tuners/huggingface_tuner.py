@@ -116,7 +116,9 @@ class HuggingFaceTuner:
         )
         architecture = HuggingFaceArchitecture(
             model=model,
+            is_preprocessed=self.module_params.is_preprocessed,
             pretrained_model_name=params["pretrained_model_name"],
+            custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             strategy=self.module_params.strategy,
             lr=params["lr"],
             t_max=params["t_max"],
