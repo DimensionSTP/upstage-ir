@@ -22,8 +22,8 @@ class HuggingFaceArchitecture(LightningModule):
     def __init__(
         self,
         model: nn.Module,
-        is_preprocessed: bool,
         pretrained_model_name: str,
+        is_preprocessed: bool,
         custom_data_encoder_path: str,
         strategy: str,
         lr: float,
@@ -38,9 +38,8 @@ class HuggingFaceArchitecture(LightningModule):
     ) -> None:
         super().__init__()
         self.model = model
-        self.is_preprocessed = is_preprocessed
         self.pretrained_model_name = pretrained_model_name
-        if self.is_preprocessed:
+        if is_preprocessed:
             data_encoder_path = (
                 f"{custom_data_encoder_path}/{self.pretrained_model_name}"
             )
@@ -52,8 +51,6 @@ class HuggingFaceArchitecture(LightningModule):
         )
         if self.data_encoder.pad_token_id is None:
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
-        if self.is_preprocessed:
-            self.model.model.resize_token_embeddings(len(self.data_encoder))
         self.strategy = strategy
         self.lr = lr
         self.t_max = t_max

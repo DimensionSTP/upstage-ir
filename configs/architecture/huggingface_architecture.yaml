@@ -3,6 +3,8 @@ _target_: src.architectures.huggingface_architecture.HuggingFaceArchitecture
 model:
   _target_: src.architectures.models.huggingface_model.HuggingFaceModel
   pretrained_model_name: ${pretrained_model_name}
+  is_preprocessed: ${is_preprocessed}
+  custom_data_encoder_path: ${custom_data_encoder_path}
   precision: ${precision}
   mode: ${mode}
   quantization_type: ${quantization_type}
@@ -22,8 +24,8 @@ model:
     bias: ${peft_config.bias}
     task_type: ${peft_config.task_type}
 
-is_preprocessed: ${is_preprocessed}
 pretrained_model_name: ${pretrained_model_name}
+is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
 strategy: ${strategy}
 lr: ${lr}

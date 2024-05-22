@@ -9,6 +9,7 @@ from transformers import (
     PreTrainedModel,
     AutoModelForSeq2SeqLM,
     AutoModelForCausalLM,
+    AutoTokenizer,
 )
 
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
@@ -18,6 +19,8 @@ class HuggingFaceModel(nn.Module):
     def __init__(
         self,
         pretrained_model_name: str,
+        is_preprocessed: bool,
+        custom_data_encoder_path: str,
         precision: Union[int, str],
         mode: str,
         quantization_type: str,
@@ -27,6 +30,8 @@ class HuggingFaceModel(nn.Module):
     ) -> None:
         super().__init__()
         self.pretrained_model_name = pretrained_model_name
+        self.is_preprocessed = is_preprocessed
+        self.custom_data_encoder_path = custom_data_encoder_path
 
         self.attn_implementation = None
         if precision == 32 or precision == "32":
@@ -112,6 +117,15 @@ class HuggingFaceModel(nn.Module):
                 quantization_config=self.quantization_config,
                 device_map=self.device_map,
             )
+
+        if self.is_preprocessed:
+            data_encoder = AutoTokenizer.from_pretrained(
+                f"{self.custom_data_encoder_path}/{self.pretrained_model_name}",
+                use_fast=True,
+            )
+            if data_encoder.pad_token_id is None:
+                data_encoder.pad_token_id = data_encoder.eos_token_id
+            model.resize_token_embeddings(len(data_encoder))
 
         model.gradient_checkpointing_enable(
             gradient_checkpointing_kwargs={
