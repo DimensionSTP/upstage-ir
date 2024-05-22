@@ -84,7 +84,7 @@ class HuggingFaceModel(nn.Module):
             options["max_length"] = target_max_length
         else:
             options["max_new_tokens"] = target_max_length
-            options["min_new_tokens"] = target_max_length
+            options["min_new_tokens"] = target_min_length
         output = self.model.generate(
             **{
                 **encoded,
