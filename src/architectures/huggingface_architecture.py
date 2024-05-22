@@ -52,6 +52,8 @@ class HuggingFaceArchitecture(LightningModule):
         )
         if self.tokenizer.pad_token_id is None:
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        if self.is_preprocessed:
+            self.model.model.resize_token_embeddings(len(self.tokenizer))
         self.strategy = strategy
         self.lr = lr
         self.t_max = t_max
