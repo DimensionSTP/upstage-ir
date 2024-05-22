@@ -267,7 +267,6 @@ class HuggingFaceArchitecture(LightningModule):
         logit = output["logit"]
         if len(logit.shape) < 3:
             logit = logit.unsqueeze(0)
-        generation_part_of_logit = logit[:, -self.target_max_length :, :]
         encoded = batch["encoded"]
         index = batch["index"]
         index_expanded = repeat(
@@ -279,7 +278,7 @@ class HuggingFaceArchitecture(LightningModule):
         logit_with_index = (
             torch.cat(
                 (
-                    generation_part_of_logit,
+                    logit,
                     index_expanded,
                 ),
                 dim=-1,
