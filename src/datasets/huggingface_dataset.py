@@ -135,7 +135,16 @@ class UpStageDialoguesDataset(Dataset):
         data_type: str,
     ) -> Dict[str, torch.Tensor]:
         if data_type == "data":
-            max_length = self.data_max_length
+            if (
+                "bart" in self.pretrained_model_name
+                or "t5" in self.pretrained_model_name
+            ):
+                max_length = self.data_max_length
+            else:
+                if self.is_preprocessed:
+                    max_length = self.data_max_length + self.target_max_length
+                else:
+                    max_length = self.data_max_length
         elif data_type == "target":
             max_length = self.target_max_length
         else:
