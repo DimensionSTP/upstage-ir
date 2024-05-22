@@ -20,7 +20,7 @@ split:
   test: test
   predict: predict
 
-batch_size: 16
+batch_size: 24
 
 is_preprocessed: True
 target_column_name: summary
