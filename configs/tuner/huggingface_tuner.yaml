@@ -33,7 +33,6 @@ module_params:
     task_type: ${peft_config.task_type}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
-  average: macro
   interval: step
   options: ${options}
   target_max_length: ${target_max_length}
