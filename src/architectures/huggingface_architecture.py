@@ -46,14 +46,14 @@ class HuggingFaceArchitecture(LightningModule):
             )
         else:
             data_encoder_path = self.pretrained_model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(
+        self.data_encoder = AutoTokenizer.from_pretrained(
             data_encoder_path,
             use_fast=True,
         )
-        if self.tokenizer.pad_token_id is None:
-            self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+        if self.data_encoder.pad_token_id is None:
+            self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         if self.is_preprocessed:
-            self.model.model.resize_token_embeddings(len(self.tokenizer))
+            self.model.model.resize_token_embeddings(len(self.data_encoder))
         self.strategy = strategy
         self.lr = lr
         self.t_max = t_max
@@ -217,12 +217,12 @@ class HuggingFaceArchitecture(LightningModule):
         generation = self.model.generate(
             encoded=encoded,
         )
-        decoded_generation = self.tokenizer.batch_decode(
+        decoded_generation = self.data_encoder.batch_decode(
             sequences=generation,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
         )
-        decoded_label = self.tokenizer.batch_decode(
+        decoded_label = self.data_encoder.batch_decode(
             sequences=label,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=False,
@@ -314,7 +314,7 @@ class HuggingFaceArchitecture(LightningModule):
         ):
             input_length = len(encoded["input_ids"][0])
             generation = generation[:, input_length:]
-        decoded_generation = self.tokenizer.batch_decode(
+        decoded_generation = self.data_encoder.batch_decode(
             sequences=generation,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True,
