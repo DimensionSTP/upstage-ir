@@ -1,10 +1,11 @@
 _target_: src.datasets.huggingface_dataset.UpStageDialoguesDataset
 data_path: ${connected_dir}/data
 split: ${split.train}
-seed: ${seed}
+is_preprocessed: ${is_preprocessed}
 target_column_name: ${target_column_name}
 num_devices: ${devices}
 batch_size: ${batch_size}
 pretrained_model_name: ${pretrained_model_name}
+custom_data_encoder_path: ${custom_data_encoder_path}
 data_max_length: ${data_max_length}
 target_max_length: ${target_max_length}

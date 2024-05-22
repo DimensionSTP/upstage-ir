@@ -13,23 +13,30 @@ class UpStageDialoguesDataset(Dataset):
         self,
         data_path: str,
         split: str,
-        seed: int,
+        is_preprocessed: bool,
         target_column_name: str,
         num_devices: int,
         batch_size: int,
         pretrained_model_name: str,
+        custom_data_encoder_path: str,
         data_max_length: int,
         target_max_length: int,
     ) -> None:
         self.data_path = data_path
         self.split = split
-        self.seed = seed
+        self.is_preprocessed = is_preprocessed
         self.target_column_name = target_column_name
         self.num_devices = num_devices
         self.batch_size = batch_size
         self.pretrained_model_name = pretrained_model_name
+        if self.is_preprocessed:
+            data_encoder_path = (
+                f"{custom_data_encoder_path}/{self.pretrained_model_name}"
+            )
+        else:
+            data_encoder_path = self.pretrained_model_name
         self.data_encoder = AutoTokenizer.from_pretrained(
-            self.pretrained_model_name,
+            data_encoder_path,
             use_fast=True,
         )
         if self.data_encoder.pad_token_id is None:
@@ -58,10 +65,13 @@ class UpStageDialoguesDataset(Dataset):
             )["input_ids"]
             encoded["labels"] = label
         else:
-            prompt = self.generate_prompt(
-                data=self.datas[idx],
-                label=self.labels[idx],
-            )
+            if self.is_preprocessed:
+                prompt = self.datas[idx]
+            else:
+                prompt = self.generate_prompt(
+                    data=self.datas[idx],
+                    label=self.labels[idx],
+                )
             encoded = self.encode_text(
                 data=prompt,
                 data_type="data",
@@ -106,7 +116,13 @@ class UpStageDialoguesDataset(Dataset):
                     )
         else:
             raise ValueError(f"Inavalid split: {self.split}")
-        datas = data["dialogue"].tolist()
+        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
+            datas = data["dialogue"].tolist()
+        else:
+            if self.is_preprocessed:
+                datas = data["cut_prompt"].tolist()
+            else:
+                datas = data["dialogue"].tolist()
         labels = data[self.target_column_name].tolist()
         return {
             "datas": datas,

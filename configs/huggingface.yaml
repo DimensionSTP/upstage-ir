@@ -22,10 +22,12 @@ split:
 
 batch_size: 4
 
+is_preprocessed: True
 target_column_name: summary
 upload_user: facebook
 model_type: bart-large-cnn
 pretrained_model_name: ${upload_user}/${model_type}
+custom_data_encoder_path: /data/upstage-nlp/data/merged_tokenizer
 data_max_length: 4096
 target_max_length: 150
 target_min_length: 100
