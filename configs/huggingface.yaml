@@ -20,17 +20,17 @@ split:
   test: test
   predict: predict
 
-batch_size: 4
+batch_size: 16
 
 is_preprocessed: True
 target_column_name: summary
-upload_user: facebook
-model_type: bart-large-cnn
+upload_user: vicgalle
+model_type: SOLAR-13B-Instruct-v1.0
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: /data/upstage-nlp/data/merged_tokenizer
-data_max_length: 4096
-target_max_length: 150
-target_min_length: 100
+data_max_length: 1024
+target_max_length: 256
+target_min_length: 16
 
 quantization_type: origin
 quantization_config:
@@ -40,17 +40,17 @@ quantization_config:
   bnb_4bit_compute_dtype: bfloat16
 peft_type: origin
 peft_config:
-  r: 8
+  r: 64
   lora_alpha: 16
   target_modules: all-linear
-  lora_dropout: 0.05
+  lora_dropout: 0.1
   bias: none
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.00002
+lr: 0.0001
 t_max: 50
-eta_min: 0.0000025
+eta_min: 0.000025
 options:
   no_repeat_ngram_size: 2
 
@@ -61,7 +61,7 @@ min_delta: 0
 
 devices: 4
 accelerator: gpu
-strategy: ddp
+strategy: deepspeed_stage_2
 log_every_n_steps: 10
 precision: bf16
 accumulate_grad_batches: 1
