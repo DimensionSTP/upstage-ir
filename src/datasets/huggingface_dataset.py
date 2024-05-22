@@ -66,7 +66,7 @@ class UpStageDialoguesDataset(Dataset):
             encoded["labels"] = label
         else:
             if self.is_preprocessed:
-                prompt = self.datas[idx]
+                prompt = self.datas[idx] + self.labels[idx]
             else:
                 prompt = self.generate_prompt(
                     data=self.datas[idx],
@@ -141,7 +141,10 @@ class UpStageDialoguesDataset(Dataset):
             ):
                 max_length = self.data_max_length
             else:
-                max_length = self.data_max_length + self.target_max_length
+                if self.split == "predict":
+                    max_length = self.data_max_length
+                else:
+                    max_length = self.data_max_length + self.target_max_length
         elif data_type == "target":
             max_length = self.target_max_length
         else:
