@@ -105,6 +105,8 @@ class HuggingFaceTuner:
 
         model = HuggingFaceModel(
             pretrained_model_name=params["pretrained_model_name"],
+            is_preprocessed=self.module_params.is_preprocessed,
+            custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             precision=self.module_params.precision,
             mode=self.module_params.model_execution_mode,
             quantization_type=self.module_params.quantization_type,
@@ -116,8 +118,8 @@ class HuggingFaceTuner:
         )
         architecture = HuggingFaceArchitecture(
             model=model,
-            is_preprocessed=self.module_params.is_preprocessed,
             pretrained_model_name=params["pretrained_model_name"],
+            is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             strategy=self.module_params.strategy,
             lr=params["lr"],
