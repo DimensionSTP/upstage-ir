@@ -42,7 +42,8 @@ def merge_predictions(
         logits,
         axis=0,
     )
-    _, unique_indices = np.unique(all_logits[:, :, -1], return_index=True)
+    unique_indices = np.unique(all_logits[:, :, -1])
+    unique_indices = unique_indices.astype(int)
     unique_all_logits = all_logits[unique_indices]
     sorted_logits_with_indices = unique_all_logits[
         np.argsort(unique_all_logits[:, 0, -1])
