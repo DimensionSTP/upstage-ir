@@ -83,7 +83,7 @@ def merge_predictions(
         )
 
     combined_generation_df = pd.concat(generation_dfs)
-    sorted_generation_df = combined_generation_df.sort_values(by="index")
+    sorted_generation_df = combined_generation_df.sort_values(by="index").reset_index()
     all_generations = sorted_generation_df[config.target_column_name]
     if len(all_generations) < len(generation_df):
         raise ValueError(
