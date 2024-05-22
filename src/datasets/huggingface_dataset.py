@@ -141,10 +141,7 @@ class UpStageDialoguesDataset(Dataset):
             ):
                 max_length = self.data_max_length
             else:
-                if self.is_preprocessed:
-                    max_length = self.data_max_length + self.target_max_length
-                else:
-                    max_length = self.data_max_length
+                max_length = self.data_max_length + self.target_max_length
         elif data_type == "target":
             max_length = self.target_max_length
         else:
