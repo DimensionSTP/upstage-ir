@@ -22,7 +22,9 @@ class HuggingFaceArchitecture(LightningModule):
     def __init__(
         self,
         model: nn.Module,
+        is_preprocessed: bool,
         pretrained_model_name: str,
+        custom_data_encoder_path: str,
         strategy: str,
         lr: float,
         t_max: int,
@@ -36,9 +38,16 @@ class HuggingFaceArchitecture(LightningModule):
     ) -> None:
         super().__init__()
         self.model = model
+        self.is_preprocessed = is_preprocessed
         self.pretrained_model_name = pretrained_model_name
+        if self.is_preprocessed:
+            data_encoder_path = (
+                f"{custom_data_encoder_path}/{self.pretrained_model_name}"
+            )
+        else:
+            data_encoder_path = self.pretrained_model_name
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.pretrained_model_name,
+            data_encoder_path,
             use_fast=True,
         )
         if self.tokenizer.pad_token_id is None:
