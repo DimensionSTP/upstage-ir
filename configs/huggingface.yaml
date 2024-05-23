@@ -27,7 +27,7 @@ target_column_name: summary
 upload_user: vicgalle
 model_type: SOLAR-13B-Instruct-v1.0
 pretrained_model_name: ${upload_user}/${model_type}
-custom_data_encoder_path: /data/upstage-nlp/data/merged_tokenizer
+custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
 data_max_length: 1024
 target_max_length: 256
 target_min_length: 16
@@ -48,9 +48,9 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.0001
+lr: 0.0002
 t_max: 50
-eta_min: 0.000025
+eta_min: 0.00005
 options:
   no_repeat_ngram_size: 2
 
@@ -61,7 +61,7 @@ min_delta: 0
 
 devices: 4
 accelerator: gpu
-strategy: deepspeed_stage_2
+strategy: deepspeed_stage_3_offload
 log_every_n_steps: 10
 precision: bf16
 accumulate_grad_batches: 1
