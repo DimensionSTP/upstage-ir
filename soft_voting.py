@@ -1,4 +1,5 @@
 import os
+import pickle
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
@@ -29,7 +30,11 @@ def softly_vote_logits(
     weighted_logits = None
     for logit_file, weight in votings.items():
         try:
-            logit = np.load(f"{basic_path}/logits/{logit_file}.npy")
+            with open(
+                f"{basic_path}/logits/{logit_file}.pickle",
+                "rb",
+            ) as f:
+                logit = pickle.load(f)
         except:
             raise FileNotFoundError(f"logit file {logit_file} does not exist")
         if weighted_logits is None:
@@ -41,14 +46,22 @@ def softly_vote_logits(
         weighted_logits,
         axis=-1,
     )
-    np.save(
+    with open(
         voted_logit,
-        weighted_logits,
-    )
-    np.save(
+        "wb",
+    ) as f:
+        pickle.dump(
+            weighted_logits,
+            f,
+        )
+    with open(
         voted_prediction,
-        ensemble_predictions,
-    )
+        "wb",
+    ) as f:
+        pickle.dump(
+            ensemble_predictions,
+            f,
+        )
 
 
 if __name__ == "__main__":
