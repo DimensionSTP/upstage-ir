@@ -52,6 +52,8 @@ lr: 0.0002
 t_max: 50
 eta_min: 0.00005
 options:
+  return_dict_in_generate: True
+  output_scores: True
   no_repeat_ngram_size: 2
 
 monitor: val_loss
