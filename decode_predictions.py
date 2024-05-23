@@ -20,60 +20,62 @@ from omegaconf import DictConfig
 def decode_predictions(
     config: DictConfig,
 ) -> None:
-    def generate_prompt(
-        data: str,
-    ) -> str:
-        default_system_prompt = "너의 역할은 대화 내용을 요약해주는 요약 전문가야. 다음 사람들의 대화 내용을 보고 적절히 요약해줘."
-        prompt = f"""### Instruction:
-        {default_system_prompt} 
-
-        ### Input:
-        {data.strip()}
-
-        ### Response:
-        """.strip()
-        return prompt
-
     with open(
         f"{config.connected_dir}/preds/{config.pred_name}.pickle",
         "rb",
     ) as f:
         all_predictions = pickle.load(f)
-    generation_df = pd.read_csv(
-        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
-    )
-    generation_df["prompt"] = generation_df["dialogue"].apply(generate_prompt)
+
+    if config.is_preprocessed:
+        data_encoder_path = (
+            f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
+        )
+    else:
+        data_encoder_path = config.pretrained_model_name
     tokenizer = AutoTokenizer.from_pretrained(
-        config.pretrained_model_name,
+        data_encoder_path,
         use_fast=True,
     )
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
-    generation_df["encoded_prompt_length"] = generation_df["prompt"].apply(
-        lambda x: len(
-            tokenizer(
-                x,
-                return_tensors="pt",
-                add_special_tokens=True,
-            )["input_ids"]
-        )
+
+    decoded_predictions = tokenizer.batch_decode(
+        sequences=all_predictions,
+        skip_special_tokens=True,
+        clean_up_tokenization_spaces=True,
     )
-    decoded_predictions = []
-    for i in range(len(all_predictions[0])):
-        encoded_prompt_length = generation_df.loc[i, "encoded_prompt_length"]
-        summary_prediction = all_predictions[i, encoded_prompt_length:]
-        decoded_prediction = tokenizer.batch_decode(
-            sequences=summary_prediction,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=True,
-        )
-        decoded_predictions.append(decoded_prediction)
+
     generation_df = pd.read_csv(
         f"{config.connected_dir}/data/{config.submission_file_name}.csv"
     )
+    original_generation_df = generation_df.copy()
     generation_df[config.target_column_name] = decoded_predictions
+    generation_df[config.target_column_name] = generation_df[
+        config.target_column_name
+    ].str.replace(
+        r"\s{2,}",
+        " ",
+        regex=True,
+    )
+    if not os.path.exists(f"{config.connected_dir}/from_decoded_predictions"):
+        os.makedirs(
+            f"{config.connected_dir}/from_decoded_predictions",
+            exist_ok=True,
+        )
     generation_df.to_csv(
-        f"{config.connected_dir}/submissions/from_decoded_predictions/{config.pred_name}.csv",
+        f"{config.connected_dir}/from_decoded_predictions/{config.pred_name}.csv",
+        index=False,
+    )
+    saved_df = pd.read_csv(
+        f"{config.connected_dir}/from_decoded_predictions/{config.pred_name}.csv"
+    )
+    if len(saved_df) > len(original_generation_df):
+        original_values = set(original_generation_df["fname"].tolist())
+        saved_values = set(saved_df["fname"].tolist())
+        conditions_to_remove = list(saved_values - original_values)
+        saved_df = saved_df[~saved_df["fname"].isin(conditions_to_remove)]
+    saved_df.to_csv(
+        f"{config.connected_dir}/from_decoded_predictions/{config.pred_name}.csv",
         index=False,
     )
 
