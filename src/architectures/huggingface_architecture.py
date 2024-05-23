@@ -257,21 +257,33 @@ class HuggingFaceArchitecture(LightningModule):
         batch: Dict[str, Any],
         batch_idx: int,
     ) -> torch.Tensor:
-        output = self.step(
-            batch=batch,
-            mode="eval",
-        )
-        logit = output["logit"]
-        if len(logit.shape) < 3:
-            logit = logit.unsqueeze(0)
         encoded = batch["encoded"]
         index = batch["index"]
+        device_num = self.device.index if self.device.index is not None else 0
+
+        output = self.model.generate(
+            encoded=encoded,
+            options=self.options,
+            target_max_length=self.target_max_length,
+            target_min_length=self.target_min_length,
+        )
+        scores = output.scores
+        logit = torch.stack(scores, dim=1)
+        generation = output.sequences
+        if (
+            "bart" not in self.pretrained_model_name
+            and "t5" not in self.pretrained_model_name
+        ):
+            input_length = len(encoded["input_ids"][0])
+            generation = generation[:, input_length:]
+
+        if len(logit.shape) < 3:
+            logit = logit.unsqueeze(0)
         index_expanded = repeat(
             index,
-            "batch_size -> batch_size data_max_length 1",
-            data_max_length=logit.size(dim=1),
+            "batch_size -> batch_size generation_max_length 1",
+            generation_max_length=logit.size(dim=1),
         )
-        index_list = index.tolist()
         logit_with_index = (
             torch.cat(
                 (
@@ -283,7 +295,6 @@ class HuggingFaceArchitecture(LightningModule):
             .cpu()
             .numpy()
         )
-        device_num = self.device.index if self.device.index is not None else 0
         if not os.path.exists(f"{self.per_device_save_path}/logits"):
             os.makedirs(
                 f"{self.per_device_save_path}/logits",
@@ -298,23 +309,12 @@ class HuggingFaceArchitecture(LightningModule):
         else:
             raise FileExistsError(f"{logit_file} already exists")
 
-        generation = self.model.generate(
-            encoded=encoded,
-            options=self.options,
-            target_max_length=self.target_max_length,
-            target_min_length=self.target_min_length,
-        )
-        if (
-            "bart" not in self.pretrained_model_name
-            and "t5" not in self.pretrained_model_name
-        ):
-            input_length = len(encoded["input_ids"][0])
-            generation = generation[:, input_length:]
         decoded_generation = self.data_encoder.batch_decode(
             sequences=generation,
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True,
         )
+        index_list = index.tolist()
         cleaned_generation = list(
             map(
                 lambda sentence: sentence.replace("\n", " ").replace("\r", " "),
