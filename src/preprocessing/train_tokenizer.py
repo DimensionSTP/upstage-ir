@@ -2,34 +2,29 @@ import os
 
 import sentencepiece as spm
 
+import hydra
+from omegaconf import DictConfig
 
+
+@hydra.main(
+    config_path="../../configs/",
+    config_name="huggingface.yaml",
+)
 def train_tokenizer(
-    input_file: str,
-    output_path: str,
-    tokenizer_name: str,
-    vocab_size: int,
+    config: DictConfig,
 ) -> None:
-    if not os.path.exists(output_path):
+    if not os.path.exists(f"{config.connected_dir}/data/sentencepiece"):
         os.makedirs(
-            output_path,
+            f"{config.connected_dir}/data/sentencepiece",
             exist_ok=True,
         )
 
     spm.SentencePieceTrainer.train(
-        input=input_file,
-        model_prefix=f"{output_path}/{tokenizer_name}",
-        vocab_size=vocab_size,
+        input=f"{config.connected_dir}/data/corpus/corpus.txt",
+        model_prefix=f"{config.connected_dir}/data/sentencepiece/dialogsum",
+        vocab_size=1128,
     )
 
 
 if __name__ == "__main__":
-    INPUT_FILE = "/data/upstage-nlp/data/corpus/corpus.txt"
-    OUTPUT_PATH = "/data/upstage-nlp/data/sentencepiece"
-    TOKENIZER_NAME = "dialogsum"
-    VOCAB_SIZE = 1128
-    train_tokenizer(
-        input_file=INPUT_FILE,
-        output_path=OUTPUT_PATH,
-        tokenizer_name=TOKENIZER_NAME,
-        vocab_size=VOCAB_SIZE,
-    )
+    train_tokenizer()

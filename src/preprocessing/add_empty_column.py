@@ -1,21 +1,22 @@
 import pandas as pd
 
+import hydra
+from omegaconf import DictConfig
 
+
+@hydra.main(
+    config_path="../../configs/",
+    config_name="huggingface.yaml",
+)
 def add_empty_column(
-    df_path: str,
-    column_name: str,
-):
-    df = pd.read_csv(df_path)
-    df[column_name] = " "
-    df.to_csv(df_path, index=False)
+    config: DictConfig,
+) -> None:
+    df = pd.read_csv(f"{config.connected_dir}/data/{config.submission_file_name}.csv")
+    df[config.target_column_name] = " "
+    df.to_csv(
+        f"{config.connected_dir}/data/{config.submission_file_name}.csv", index=False
+    )
 
 
 if __name__ == "__main__":
-    DATA_PATH = "/data/upstage-nlp/data"
-    COLUMN_NAME = "summary"
-    FILES = ["test", "sample_submission"]
-    for file in FILES:
-        add_empty_column(
-            df_path=f"{DATA_PATH}/{file}.csv",
-            column_name=COLUMN_NAME,
-        )
+    add_empty_column()

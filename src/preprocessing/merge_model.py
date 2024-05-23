@@ -1,24 +1,27 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+import hydra
+from omegaconf import DictConfig
 
+
+@hydra.main(
+    config_path="../../configs/",
+    config_name="huggingface.yaml",
+)
 def merge_model(
-    path: str,
-    pretrained_model_name: str,
+    config: DictConfig,
 ) -> None:
     tokenizer = AutoTokenizer.from_pretrained(
-        f"{path}/merged_tokenizer/{pretrained_model_name}"
+        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
     )
-    model = AutoModelForCausalLM.from_pretrained(pretrained_model_name)
+    model = AutoModelForCausalLM.from_pretrained(config.pretrained_model_name)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
     model.resize_token_embeddings(len(tokenizer))
-    model.save_pretrained(f"{path}/merged_model/{pretrained_model_name}")
+    model.save_pretrained(
+        f"{config.connected_dir}/data/merged_model/{config.pretrained_model_name}"
+    )
 
 
 if __name__ == "__main__":
-    PATH = "/data/upstage-nlp/data"
-    PRETRAINED_MODEL_NAME = "vicgalle/SOLAR-13B-Instruct-v1.0"
-    merge_model(
-        path=PATH,
-        pretrained_model_name=PRETRAINED_MODEL_NAME,
-    )
+    merge_model()

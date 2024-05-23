@@ -1,17 +1,24 @@
+import os
+
 import pandas as pd
 
 from transformers import AutoTokenizer
 
+import hydra
+from omegaconf import DictConfig
 
+
+@hydra.main(
+    config_path="../../configs/",
+    config_name="huggingface.yaml",
+)
 def preprocess_dataset(
-    dataset_path: str,
-    dataset_file: str,
-    tokenizer_path: str,
-    max_length: int,
-    save_prefix: str,
+    config: DictConfig,
 ) -> None:
-    df = pd.read_csv(f"{dataset_path}/{dataset_file}.csv")
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    df = pd.read_csv(f"{config.connected_dir}/data/{config.mode}.csv")
+    tokenizer = AutoTokenizer.from_pretrained(
+        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
+    )
 
     def generate_prompt(
         data: str,
@@ -42,33 +49,21 @@ def preprocess_dataset(
         lambda x: cut_prompt_to_length(
             prompt=x,
             tokenizer=tokenizer,
-            max_length=max_length,
+            max_length=config.data_max_length,
         )
     )
+    if not os.path.exists(
+        f"{config.connected_dir}/data/{config.pretrained_model_name}"
+    ):
+        os.makedirs(
+            f"{config.connected_dir}/data/{config.pretrained_model_name}",
+            exist_ok=True,
+        )
     df.to_csv(
-        f"{dataset_path}/{save_prefix}_{dataset_file}.csv",
+        f"{config.connected_dir}/data/{config.pretrained_model_name}/{config.mode}.csv",
         index=False,
     )
 
 
 if __name__ == "__main__":
-    DATASET_PATH = "/data/upstage-nlp/data"
-    DATASET_FILES = [
-        "train",
-        "dev",
-        "test",
-    ]
-    TOKENIZER_PATH = (
-        "/data/upstage-nlp/data/merged_tokenizer/vicgalle/SOLAR-13B-Instruct-v1.0"
-    )
-    MAX_LENGTH = 1024
-    SAVE_PREFIX = "preprocessed"
-
-    for dataset_file in DATASET_FILES:
-        preprocess_dataset(
-            dataset_path=DATASET_PATH,
-            dataset_file=dataset_file,
-            tokenizer_path=TOKENIZER_PATH,
-            max_length=MAX_LENGTH,
-            save_prefix=SAVE_PREFIX,
-        )
+    preprocess_dataset()

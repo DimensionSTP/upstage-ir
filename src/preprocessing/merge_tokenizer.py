@@ -3,16 +3,21 @@ import os
 from transformers import AutoTokenizer
 import sentencepiece as spm
 
+import hydra
+from omegaconf import DictConfig
 
+
+@hydra.main(
+    config_path="../../configs/",
+    config_name="huggingface.yaml",
+)
 def merge_tokenizer(
-    pretrained_model_name: str,
-    custom_tokenizer_file: str,
-    merged_tokenizer_save_path: str,
+    config: DictConfig,
 ) -> None:
-    tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name)
+    tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
 
     sp = spm.SentencePieceProcessor()
-    sp.load(custom_tokenizer_file)
+    sp.load(f"{config.connected_dir}/data/sentencepiece/dialogsum.model")
 
     new_tokens = []
     for idx in range(sp.get_piece_size()):
@@ -22,22 +27,17 @@ def merge_tokenizer(
 
     tokenizer.add_tokens(new_tokens)
 
-    if not os.path.exists(merged_tokenizer_save_path):
+    if not os.path.exists(
+        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
+    ):
         os.makedirs(
-            merged_tokenizer_save_path,
+            f"{config.custom_data_encoder_path}/{config.pretrained_model_name}",
             exist_ok=True,
         )
-    tokenizer.save_pretrained(merged_tokenizer_save_path)
+    tokenizer.save_pretrained(
+        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
+    )
 
 
 if __name__ == "__main__":
-    PRETRAINED_MODEL_NAME = "vicgalle/SOLAR-13B-Instruct-v1.0"
-    CUSTOM_TOKENIZER_FILE = "/data/upstage-nlp/data/sentencepiece/dialogsum.model"
-    MERGED_TOKENIZER_SAVE_PATH = (
-        f"/data/upstage-nlp/data/merged_tokenizer/{PRETRAINED_MODEL_NAME}"
-    )
-    merge_tokenizer(
-        pretrained_model_name=PRETRAINED_MODEL_NAME,
-        custom_tokenizer_file=CUSTOM_TOKENIZER_FILE,
-        merged_tokenizer_save_path=MERGED_TOKENIZER_SAVE_PATH,
-    )
+    merge_tokenizer()
