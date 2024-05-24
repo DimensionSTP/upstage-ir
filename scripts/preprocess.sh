@@ -1,8 +1,14 @@
-python src/preprocessing/add_empty_column.py
-python src/preprocessing/make_corpus.py
-python src/preprocessing/train_tokenizer.py
-python src/preprocessing/merge_tokenizer.py
-python src/preprocessing/merge_model.py
-python src/preprocessing/preprocess_dataset.py mode=train
-python src/preprocessing/preprocess_dataset.py mode=dev
-python src/preprocessing/preprocess_dataset.py mode=test
+path="src/preprocessing"
+
+python $path/add_empty_column.py
+python $path/make_corpus.py
+python $path/train_tokenizer.py
+python $path/merge_tokenizer.py
+python $path/merge_model.py
+
+dataset_modes="train dev test"
+
+for dataset_mode in $dataset_modes
+do
+    python $path/preprocess_dataset.py mode=$dataset_mode
+done
