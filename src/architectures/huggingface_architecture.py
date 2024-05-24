@@ -282,8 +282,30 @@ class HuggingFaceArchitecture(LightningModule):
         index_expanded = repeat(
             index,
             "batch_size -> batch_size generation_max_length 1",
-            generation_max_length=logit.size(dim=1),
+            generation_max_length=self.target_max_length,
         )
+        if logit.size(dim=1) < self.target_max_length:
+            remaining_length = self.target_max_length - logit.size(dim=1)
+            pad_logit = torch.zeros(
+                (
+                    logit.size(
+                        dim=0,
+                    ),
+                    remaining_length,
+                    logit.size(
+                        dim=2,
+                    ),
+                ),
+                device=logit.device,
+            )
+            pad_logit[:, :, self.data_encoder.pad_token_id] = 1
+            logit = torch.cat(
+                (
+                    logit,
+                    pad_logit,
+                ),
+                dim=1,
+            )
         logit_with_index = (
             torch.cat(
                 (
