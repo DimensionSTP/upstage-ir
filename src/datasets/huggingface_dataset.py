@@ -95,7 +95,7 @@ class UpStageDialoguesDataset(Dataset):
             if self.is_preprocessed:
                 csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/dev.csv"
             else:
-                f"{self.data_path}/dev.csv"
+                csv_path = f"{self.data_path}/dev.csv"
             data = pd.read_csv(csv_path)
             data = data.fillna("_")
         elif self.split == "predict":
