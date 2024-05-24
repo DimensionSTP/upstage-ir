@@ -29,9 +29,17 @@ def merge_tokenizer(
         "#Person1#",
         "#Person2#",
         "#Person3#",
+        "#Person4#",
+        "#Person5#",
+        "#Person6#",
+        "#Person7#",
         "#PhoneNumber#",
         "#Address#",
         "#PassportNumber#",
+        "#CardNumber#",
+        "#Email#",
+        "#SSN#",
+        "#DateOfBirth#",
     ]
     for eda_token in eda_tokens:
         if eda_token not in new_tokens and eda_token not in tokenizer.get_vocab():
