@@ -231,12 +231,24 @@ def predict(
             logged_hparams[key] = value
     logger.log_hyperparams(logged_hparams)
 
-    trainer: Trainer = instantiate(
-        config.trainer,
-        callbacks=callbacks,
-        logger=logger,
-        _convert_="partial",
-    )
+    if (
+        config.strategy == "deepspeed_stage_3"
+        or config.strategy == "deepspeed_stage_3_offload"
+    ):
+        trainer: Trainer = instantiate(
+            config.trainer,
+            strategy="ddp",
+            callbacks=callbacks,
+            logger=logger,
+            _convert_="partial",
+        )
+    else:
+        trainer: Trainer = instantiate(
+            config.trainer,
+            callbacks=callbacks,
+            logger=logger,
+            _convert_="partial",
+        )
 
     try:
         if (
