@@ -85,15 +85,24 @@ class UpStageDialoguesDataset(Dataset):
 
     def get_dataset(self) -> Dict[str, List[Any]]:
         if self.split in ["train", "test"]:
-            csv_path = f"{self.data_path}/{self.pretrained_model_name}/{self.split}.csv"
+            if self.is_preprocessed:
+                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/{self.split}.csv"
+            else:
+                csv_path = f"{self.data_path}/{self.split}.csv"
             data = pd.read_csv(csv_path)
             data = data.fillna("_")
         elif self.split == "val":
-            csv_path = f"{self.data_path}/{self.pretrained_model_name}/dev.csv"
+            if self.is_preprocessed:
+                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/dev.csv"
+            else:
+                f"{self.data_path}/dev.csv"
             data = pd.read_csv(csv_path)
             data = data.fillna("_")
         elif self.split == "predict":
-            csv_path = f"{self.data_path}/{self.pretrained_model_name}/test.csv"
+            if self.is_preprocessed:
+                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/test.csv"
+            else:
+                csv_path = f"{self.data_path}/test.csv"
             data = pd.read_csv(csv_path)
             data = data.fillna("_")
             if self.num_devices > 1:
