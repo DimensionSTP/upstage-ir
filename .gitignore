@@ -1,4 +1,7 @@
 *.ckpt
+*.env
+*.out
+*.model
 *.csv
 *.mp4
 *.npy
@@ -6,6 +9,8 @@
 *.xml
 *.json
 *.ipynb
+*.tar
+*.tar.gz
 *__pycache__
 logs/runs/
 logs/wandb/
@@ -15,4 +20,3 @@ baseline/
 tmp*
 !requirements.txt
 !packages.txt
-*.out
