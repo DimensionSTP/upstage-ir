@@ -8,6 +8,8 @@
 *.txt
 *.xml
 *.json
+*.pkl
+*.pickle
 *.ipynb
 *.tar
 *.tar.gz
