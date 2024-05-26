@@ -9,8 +9,8 @@ defaults:
   - trainer: trainer
 
 package_name: upstage-nlp
-project_dir: /home/ddang/${package_name}
-connected_dir: /data/${package_name}
+project_dir: ${oc.env:PROJECT_DIR}/${package_name}
+connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
 seed: 2024
 
@@ -24,8 +24,8 @@ batch_size: 24
 
 is_preprocessed: True
 target_column_name: summary
-upload_user: vicgalle
-model_type: SOLAR-13B-Instruct-v1.0
+upload_user: beomi
+model_type: OPEN-SOLAR-KO-10.7B
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
 data_max_length: 1024
@@ -48,9 +48,9 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.0002
-t_max: 50
-eta_min: 0.00005
+lr: 0.0001
+period: 2
+eta_min: 0.00001
 options:
   return_dict_in_generate: True
   output_scores: True
@@ -58,15 +58,17 @@ options:
 
 monitor: val_loss
 tracking_direction: min
-patience: 3
+patience: 2
 min_delta: 0
 
-devices: 4
+devices: ${oc.decode:${oc.env:DEVICES}}
 accelerator: gpu
 strategy: deepspeed_stage_3_offload
 log_every_n_steps: 10
 precision: bf16
 accumulate_grad_batches: 1
+gradient_clip_val: 1
+gradient_clip_algorithm: norm
 epoch: 100
 
 model_name: HuggingFace
