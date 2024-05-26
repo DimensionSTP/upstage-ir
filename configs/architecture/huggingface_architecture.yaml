@@ -29,7 +29,7 @@ is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
 strategy: ${strategy}
 lr: ${lr}
-t_max: ${t_max}
+period: ${period}
 eta_min: ${eta_min}
 interval: step
 options: ${options}
