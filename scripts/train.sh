@@ -1,6 +1,26 @@
+#!/bin/bash
+
+is_preprocessed=True
+is_tuned="untuned"
+strategy="deepspeed_stage_3_offload"
+upload_user="beomi"
+model_type="OPEN-SOLAR-KO-10.7B"
 quantization_type="quantization"
 peft_type="lora"
-upload_user="vicgalle"
-model_type="SOLAR-13B-Instruct-v1.0"
+data_max_length=1024
+target_max_length=256
+precision="bf16"
+batch_size=24
 
-python main.py mode=train is_tuned=untuned is_preprocessed=True quantization_type=$quantization_type peft_type=$peft_type upload_user=$upload_user model_type=$model_type
+python main.py mode=train \
+    is_preprocessed=$is_preprocessed \
+    is_tuned=$is_tuned \
+    strategy=$strategy \
+    upload_user=$upload_user \
+    model_type=$model_type \
+    quantization_type=$quantization_type \
+    peft_type=$peft_type \
+    data_max_length=$data_max_length \
+    target_max_length=$target_max_length \
+    precision=$precision \
+    batch_size=$batch_size

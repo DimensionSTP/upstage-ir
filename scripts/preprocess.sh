@@ -1,3 +1,5 @@
+#!/bin/bash
+
 path="src/preprocessing"
 
 python $path/add_empty_column.py
