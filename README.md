@@ -20,6 +20,14 @@ conda activate myenv
 pip install -r requirements.txt
 ```
 
+### .env file setting
+```shell
+PROJECT_DIR={PROJECT_DIR}
+CONNECTED_DIR={CONNECTED_DIR}
+DEVICES={DEVICES}
+HF_HOME={HF_HOME}
+```
+
 ### Model Hyper-Parameters Tuning
 
 * end-to-end
@@ -46,6 +54,30 @@ python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epo
 * end-to-end
 ```shell
 python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+python merge_predictions.py is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+python decode_predictions.py is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
+```
+
+### Examples of shell scipts
+
+* full preprocessing
+```shell
+bash scripts/preprocess.sh
+```
+
+* dataset preprocessing
+```shell
+bash scripts/preprocess_dataset.sh
+```
+
+* train
+```shell
+bash scripts/train.sh
+```
+
+* predict
+```shell
+bash scripts/predict.sh
 ```
 
 ### Additional Options
@@ -62,7 +94,7 @@ peft_type={origin or lora}
 
 * for LLM fine-tuning in multi-GPU, recommended
 ```shell
-strategy={deepspeed_stage_2 or deepspeed_stage_2_offload}
+strategy={deepspeed_stage_2 or deepspeed_stage_2_offload or deepspeed_stage_3 or deepspeed_stage_3_offload}
 ```
 
 * upload user name and model name at HuggingFace Model card
