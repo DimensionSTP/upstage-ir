@@ -88,12 +88,12 @@ class HuggingFaceTuner:
                 high=self.hparams.lr.high,
                 log=self.hparams.lr.log,
             )
-        if self.hparams.t_max:
-            params["t_max"] = trial.suggest_int(
-                name="t_max",
-                low=self.hparams.t_max.low,
-                high=self.hparams.t_max.high,
-                log=self.hparams.t_max.log,
+        if self.hparams.period:
+            params["period"] = trial.suggest_int(
+                name="period",
+                low=self.hparams.period.low,
+                high=self.hparams.period.high,
+                log=self.hparams.period.log,
             )
         if self.hparams.eta_min:
             params["eta_min"] = trial.suggest_float(
@@ -123,7 +123,7 @@ class HuggingFaceTuner:
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             strategy=self.module_params.strategy,
             lr=params["lr"],
-            t_max=params["t_max"],
+            period=params["period"],
             eta_min=params["eta_min"],
             interval=self.module_params.interval,
             options=self.module_params.options,
@@ -148,6 +148,8 @@ class HuggingFaceTuner:
             log_every_n_steps=self.module_params.log_every_n_steps,
             precision=self.module_params.precision,
             accumulate_grad_batches=self.module_params.accumulate_grad_batches,
+            gradient_clip_val=self.module_params.gradient_clip_val,
+            gradient_clip_algorithm=self.module_params.gradient_clip_algorithm,
             max_epochs=self.module_params.max_epochs,
             enable_checkpointing=False,
             callbacks=callbacks,
