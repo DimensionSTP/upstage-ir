@@ -24,7 +24,7 @@ from omegaconf import DictConfig
 def softly_vote_logits(
     config: DictConfig,
 ) -> None:
-    basic_path = config.basic_path
+    connected_dir = config.connected_dir
     voted_logit = config.voted_logit
     voted_prediction = config.voted_prediction
     votings = config.votings
@@ -37,7 +37,7 @@ def softly_vote_logits(
     for logit_file, weight in votings.items():
         try:
             with open(
-                f"{basic_path}/logits/{logit_file}.pickle",
+                f"{connected_dir}/logits/{logit_file}.pickle",
                 "rb",
             ) as f:
                 logit = pickle.load(f)
