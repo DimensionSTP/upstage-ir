@@ -4,11 +4,12 @@ defaults:
 run_name: soft_voting
 work_dir: ${hydra:runtime.cwd}
 
-basic_path: /data/upstage-nlp
+package_name: upstage-nlp
+connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 voted_name: soft_voting
 
-voted_logit: ${basic_path}/logits/${voted_name}.pickle
-voted_prediction: ${basic_path}/preds/${voted_name}.pickle
+voted_logit: ${connected_dir}/logits/${voted_name}.pickle
+voted_prediction: ${connected_dir}/preds/${voted_name}.pickle
 
 votings:
   logit1: 0.5
