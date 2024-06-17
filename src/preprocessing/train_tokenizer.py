@@ -27,7 +27,7 @@ def train_tokenizer(
 
     spm.SentencePieceTrainer.train(
         input=f"{config.connected_dir}/data/corpus/corpus.txt",
-        model_prefix=f"{config.connected_dir}/data/sentencepiece/dialogsum",
+        model_prefix=f"{config.connected_dir}/data/sentencepiece/{config.dataset_name}",
         vocab_size=1128,
     )
 
