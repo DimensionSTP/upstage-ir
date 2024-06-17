@@ -20,7 +20,7 @@ split:
   test: test
   predict: predict
 
-batch_size: 24
+batch_size: 16
 
 is_causal: True
 is_preprocessed: True

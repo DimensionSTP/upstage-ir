@@ -5,12 +5,12 @@ is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="beomi"
 model_type="OPEN-SOLAR-KO-10.7B"
-quantization_type="quantization"
-peft_type="lora"
+quantization_type="origin"
+peft_type="origin"
 data_max_length=1024
 target_max_length=256
 precision="bf16"
-batch_size=24
+batch_size=16
 epochs="3 4"
 
 for epoch in $epochs
