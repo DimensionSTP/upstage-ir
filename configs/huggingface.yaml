@@ -22,7 +22,10 @@ split:
 
 batch_size: 24
 
+is_causal: True
 is_preprocessed: True
+data_column_name: dialogue
+prompt_column_name: cut_prompt
 target_column_name: summary
 upload_user: beomi
 model_type: OPEN-SOLAR-KO-10.7B
