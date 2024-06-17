@@ -13,7 +13,10 @@ class UpStageDialoguesDataset(Dataset):
         self,
         data_path: str,
         split: str,
+        is_causal: bool,
         is_preprocessed: bool,
+        data_column_name: str,
+        prompt_column_name: str,
         target_column_name: str,
         num_devices: int,
         batch_size: int,
@@ -24,7 +27,10 @@ class UpStageDialoguesDataset(Dataset):
     ) -> None:
         self.data_path = data_path
         self.split = split
+        self.is_causal = is_causal
         self.is_preprocessed = is_preprocessed
+        self.data_column_name = data_column_name
+        self.prompt_column_name = prompt_column_name
         self.target_column_name = target_column_name
         self.num_devices = num_devices
         self.batch_size = batch_size
@@ -54,7 +60,7 @@ class UpStageDialoguesDataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
+        if not self.is_causal:
             encoded = self.encode_text(
                 data=self.datas[idx],
                 data_type="data",
@@ -125,13 +131,13 @@ class UpStageDialoguesDataset(Dataset):
                     )
         else:
             raise ValueError(f"Inavalid split: {self.split}")
-        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
-            datas = data["dialogue"].tolist()
+        if not self.is_causal:
+            datas = data[self.data_column_name].tolist()
         else:
             if self.is_preprocessed:
-                datas = data["cut_prompt"].tolist()
+                datas = data[self.prompt_column_name].tolist()
             else:
-                datas = data["dialogue"].tolist()
+                datas = data[self.data_column_name].tolist()
         labels = data[self.target_column_name].tolist()
         return {
             "datas": datas,
@@ -144,10 +150,7 @@ class UpStageDialoguesDataset(Dataset):
         data_type: str,
     ) -> Dict[str, torch.Tensor]:
         if data_type == "data":
-            if (
-                "bart" in self.pretrained_model_name
-                or "t5" in self.pretrained_model_name
-            ):
+            if not self.is_causal:
                 max_length = self.data_max_length
             else:
                 if self.split == "predict":
