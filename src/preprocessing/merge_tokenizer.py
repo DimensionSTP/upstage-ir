@@ -23,7 +23,7 @@ def merge_tokenizer(
     tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
 
     sp = spm.SentencePieceProcessor()
-    sp.load(f"{config.connected_dir}/data/sentencepiece/dialogsum.model")
+    sp.load(f"{config.connected_dir}/data/sentencepiece/{config.dataset_name}.model")
 
     new_tokens = []
     for idx in range(sp.get_piece_size()):
