@@ -28,7 +28,6 @@ class HuggingFaceTuner:
         seed: int,
         num_trials: int,
         hparams_save_path: str,
-        monitor: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
         logger: WandbLogger,
@@ -39,7 +38,6 @@ class HuggingFaceTuner:
         self.seed = seed
         self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
-        self.monitor = monitor
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.logger = logger
@@ -109,6 +107,7 @@ class HuggingFaceTuner:
 
         model = HuggingFaceModel(
             pretrained_model_name=params["pretrained_model_name"],
+            is_causal=self.module_params.is_causal,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             precision=self.module_params.precision,
