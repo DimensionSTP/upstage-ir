@@ -31,14 +31,17 @@ def preprocess_dataset(
     ) -> str:
         default_system_prompt = "너의 역할은 대화 내용을 요약해주는 요약 전문가야. 다음 사람들의 대화 내용을 보고 적절히 요약해줘."
         prompt = f"""### Instruction:
-        {default_system_prompt} 
+        {default_system_prompt}
+
         ### Input:
         {data.strip()}
+
         ### Response:
         """.strip()
         return prompt
 
-    df["prompt"] = df["dialogue"].apply(generate_prompt)
+    df["prompt"] = df[config.data_column_name].apply(generate_prompt)
+    df[config.data_column_name] = df[config.data_column_name].apply(lambda x: x.strip())
 
     def cut_prompt_to_length(
         prompt: str,
@@ -51,7 +54,7 @@ def preprocess_dataset(
         cut_prompt = tokenizer.convert_tokens_to_string(tokens)
         return cut_prompt
 
-    df["cut_prompt"] = df["prompt"].apply(
+    df[config.prompt_column_name] = df["prompt"].apply(
         lambda x: cut_prompt_to_length(
             prompt=x,
             tokenizer=tokenizer,
