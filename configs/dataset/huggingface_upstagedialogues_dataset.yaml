@@ -1,7 +1,10 @@
 _target_: src.datasets.huggingface_dataset.UpStageDialoguesDataset
 data_path: ${connected_dir}/data
 split: ${split.train}
+is_causal: ${is_causal}
 is_preprocessed: ${is_preprocessed}
+data_column_name: ${data_column_name}
+prompt_column_name: ${prompt_column_name}
 target_column_name: ${target_column_name}
 num_devices: ${devices}
 batch_size: ${batch_size}
