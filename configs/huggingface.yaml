@@ -31,6 +31,7 @@ upload_user: beomi
 model_type: OPEN-SOLAR-KO-10.7B
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
+merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
 data_max_length: 1024
 target_max_length: 256
 target_min_length: 16
