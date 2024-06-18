@@ -6,6 +6,7 @@ model:
   is_causal: ${is_causal}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  merged_model_path: ${merged_model_path}
   precision: ${precision}
   mode: ${mode}
   quantization_type: ${quantization_type}
