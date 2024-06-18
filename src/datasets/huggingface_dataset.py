@@ -132,12 +132,12 @@ class UpStageDialoguesDataset(Dataset):
         else:
             raise ValueError(f"Inavalid split: {self.split}")
         if not self.is_causal:
-            datas = data[self.data_column_name].tolist()
+            datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
         else:
             if self.is_preprocessed:
                 datas = data[self.prompt_column_name].tolist()
             else:
-                datas = data[self.data_column_name].tolist()
+                datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
         labels = data[self.target_column_name].tolist()
         return {
             "datas": datas,
