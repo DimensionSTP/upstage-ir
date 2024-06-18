@@ -22,6 +22,7 @@ class HuggingFaceModel(nn.Module):
         is_causal: bool,
         is_preprocessed: bool,
         custom_data_encoder_path: str,
+        merged_model_path: str,
         precision: Union[int, str],
         mode: str,
         quantization_type: str,
@@ -34,6 +35,13 @@ class HuggingFaceModel(nn.Module):
         self.is_causal = is_causal
         self.is_preprocessed = is_preprocessed
         self.custom_data_encoder_path = custom_data_encoder_path
+        self.merged_model_path = merged_model_path
+
+        if self.is_preprocessed:
+            if os.path.exists(self.merged_model_path):
+                self.model_path = self.merged_model_path
+            else:
+                self.model_path = self.pretrained_model_name
 
         self.attn_implementation = None
         if precision == 32 or precision == "32":
@@ -103,7 +111,7 @@ class HuggingFaceModel(nn.Module):
     def get_model(self) -> PreTrainedModel:
         if not self.is_causal:
             model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.pretrained_model_name,
+                self.model_path,
                 output_hidden_states=False,
                 torch_dtype=self.precision,
                 attn_implementation=self.attn_implementation,
@@ -112,7 +120,7 @@ class HuggingFaceModel(nn.Module):
             )
         else:
             model = AutoModelForCausalLM.from_pretrained(
-                self.pretrained_model_name,
+                self.model_path,
                 output_hidden_states=False,
                 torch_dtype=self.precision,
                 attn_implementation=self.attn_implementation,
