@@ -87,7 +87,7 @@ class HuggingFaceModel(nn.Module):
         target_max_length: int,
         target_min_length: int,
     ) -> torch.Tensor:
-        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
+        if not self.is_causal:
             options["max_length"] = target_max_length
         else:
             options["max_new_tokens"] = target_max_length
@@ -101,7 +101,7 @@ class HuggingFaceModel(nn.Module):
         return output
 
     def get_model(self) -> PreTrainedModel:
-        if "bart" in self.pretrained_model_name or "t5" in self.pretrained_model_name:
+        if not self.is_causal:
             model = AutoModelForSeq2SeqLM.from_pretrained(
                 self.pretrained_model_name,
                 output_hidden_states=False,
