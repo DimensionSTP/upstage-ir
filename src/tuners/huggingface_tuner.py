@@ -110,6 +110,7 @@ class HuggingFaceTuner:
             is_causal=self.module_params.is_causal,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
+            merged_model_path=self.module_params.merged_model_path,
             precision=self.module_params.precision,
             mode=self.module_params.model_execution_mode,
             quantization_type=self.module_params.quantization_type,
