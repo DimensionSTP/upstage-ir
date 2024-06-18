@@ -20,7 +20,8 @@ def add_empty_column(
     df = pd.read_csv(f"{config.connected_dir}/data/{config.submission_file_name}.csv")
     df[config.target_column_name] = " "
     df.to_csv(
-        f"{config.connected_dir}/data/{config.submission_file_name}.csv", index=False
+        f"{config.connected_dir}/data/{config.submission_file_name}.csv",
+        index=False,
     )
 
 
