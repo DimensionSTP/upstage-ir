@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: huggingface_upstagedialogues_dataset
+  - dataset: huggingface_upstagedocumentqa_dataset
   - architecture: huggingface_architecture
   - tuner: huggingface_tuner
   - logger: wandb
@@ -8,7 +8,7 @@ defaults:
   - callbacks: callbacks
   - trainer: trainer
 
-package_name: upstage-nlp
+package_name: upstage-ir
 project_dir: ${oc.env:PROJECT_DIR}/${package_name}
 connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
@@ -24,9 +24,9 @@ batch_size: 16
 
 is_causal: True
 is_preprocessed: True
-data_column_name: dialogue
+data_column_name: Question
 prompt_column_name: cut_prompt
-target_column_name: summary
+target_column_name: Answer
 upload_user: beomi
 model_type: OPEN-SOLAR-KO-10.7B
 pretrained_model_name: ${upload_user}/${model_type}
@@ -76,7 +76,7 @@ gradient_clip_algorithm: norm
 epoch: 100
 
 model_name: HuggingFace
-dataset_name: UpStageDialogues
+dataset_name: UpStageDocumentQA
 mode: train
 
 is_tuned: tuned
