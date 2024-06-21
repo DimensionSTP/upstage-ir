@@ -6,8 +6,6 @@ import pandas as pd
 
 import torch
 from torch import optim, nn
-from torchmetrics import MetricCollection
-from torchmetrics.text.rouge import ROUGEScore
 
 from einops import repeat
 
@@ -23,7 +21,6 @@ class HuggingFaceArchitecture(LightningModule):
         self,
         model: nn.Module,
         pretrained_model_name: str,
-        is_causal: bool,
         is_preprocessed: bool,
         custom_data_encoder_path: str,
         strategy: str,
@@ -40,7 +37,6 @@ class HuggingFaceArchitecture(LightningModule):
         super().__init__()
         self.model = model
         self.pretrained_model_name = pretrained_model_name
-        self.is_causal = is_causal
         if is_preprocessed:
             data_encoder_path = (
                 f"{custom_data_encoder_path}/{self.pretrained_model_name}"
@@ -64,13 +60,6 @@ class HuggingFaceArchitecture(LightningModule):
         self.per_device_save_path = per_device_save_path
         self.target_column_name = target_column_name
 
-        metrics = MetricCollection(
-            [
-                ROUGEScore(),
-            ]
-        )
-        self.test_metrics = metrics.clone(prefix="test_")
-
     def forward(
         self,
         encoded: Dict[str, torch.Tensor],
@@ -91,8 +80,7 @@ class HuggingFaceArchitecture(LightningModule):
         mode: str,
     ) -> Dict[str, torch.Tensor]:
         encoded = batch["encoded"]
-        if self.is_causal:
-            encoded["labels"] = encoded["input_ids"]
+        encoded["labels"] = encoded["input_ids"]
         label = encoded["labels"]
         index = batch["index"]
         output = self(
@@ -210,24 +198,6 @@ class HuggingFaceArchitecture(LightningModule):
         loss = output["loss"]
         pred = output["pred"]
         label = output["label"]
-        encoded = batch["encoded"]
-        generation = self.model.generate(
-            encoded=encoded,
-        )
-        decoded_generation = self.data_encoder.batch_decode(
-            sequences=generation,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
-        )
-        decoded_label = self.data_encoder.batch_decode(
-            sequences=label,
-            skip_special_tokens=True,
-            clean_up_tokenization_spaces=False,
-        )
-        metrics = self.test_metrics(
-            decoded_generation,
-            decoded_label,
-        )
         self.log(
             "test_loss",
             loss,
@@ -236,20 +206,10 @@ class HuggingFaceArchitecture(LightningModule):
             prog_bar=False,
             sync_dist=True,
         )
-        self.log_dict(
-            metrics,
-            on_step=False,
-            on_epoch=True,
-            prog_bar=True,
-            sync_dist=False,
-        )
         return {
             "loss": loss,
             "pred": pred,
-            "generation": generation,
-            "decoded_generation": decoded_generation,
             "label": label,
-            "decoded_label": decoded_label,
         }
 
     def predict_step(
@@ -270,9 +230,8 @@ class HuggingFaceArchitecture(LightningModule):
         scores = output.scores
         logit = torch.stack(scores, dim=1)
         generation = output.sequences
-        if self.is_causal:
-            input_length = len(encoded["input_ids"][0])
-            generation = generation[:, input_length:]
+        input_length = len(encoded["input_ids"][0])
+        generation = generation[:, input_length:]
 
         if len(logit.shape) < 3:
             logit = logit.unsqueeze(0)
@@ -370,4 +329,4 @@ class HuggingFaceArchitecture(LightningModule):
         pass
 
     def on_test_epoch_end(self) -> None:
-        self.test_metrics.reset()
+        pass
