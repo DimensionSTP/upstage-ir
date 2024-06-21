@@ -1,16 +1,16 @@
-# Summary DL pipeline for NLP competition
+# Backbone model fine-tuning pipeline for IR competition
 
-## For Upstage NLP competition
+## For Upstage IR competition
 
 ### Dataset
-Upstage NLP competition dataset(dialogue summarization)
+Upstage IR competition dataset(information retrieval document question-answer pair dataset)
 
 ### Quick setup
 
 ```bash
 # clone project
-git clone https://github.com/DimensionSTP/upstage-nlp.git
-cd upstage-nlp
+git clone https://github.com/DimensionSTP/upstage-ir.git
+cd upstage-ir
 
 # [OPTIONAL] create conda environment
 conda create -n myenv python=3.8
