@@ -3,7 +3,6 @@ _target_: src.architectures.huggingface_architecture.HuggingFaceArchitecture
 model:
   _target_: src.architectures.models.huggingface_model.HuggingFaceModel
   pretrained_model_name: ${pretrained_model_name}
-  is_causal: ${is_causal}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
   merged_model_path: ${merged_model_path}
@@ -27,7 +26,6 @@ model:
     task_type: ${peft_config.task_type}
 
 pretrained_model_name: ${pretrained_model_name}
-is_causal: ${is_causal}
 is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
 strategy: ${strategy}
