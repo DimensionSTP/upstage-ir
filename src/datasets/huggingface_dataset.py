@@ -1,6 +1,7 @@
 from typing import Dict, Any, List
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 import torch
 from torch.utils.data import Dataset
@@ -8,12 +9,13 @@ from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 
 
-class UpStageDialoguesDataset(Dataset):
+class UpStageDocumentQADataset(Dataset):
     def __init__(
         self,
         data_path: str,
         split: str,
-        is_causal: bool,
+        split_ratio: float,
+        seed: int,
         is_preprocessed: bool,
         data_column_name: str,
         prompt_column_name: str,
@@ -27,7 +29,8 @@ class UpStageDialoguesDataset(Dataset):
     ) -> None:
         self.data_path = data_path
         self.split = split
-        self.is_causal = is_causal
+        self.split_ratio = split_ratio
+        self.seed = seed
         self.is_preprocessed = is_preprocessed
         self.data_column_name = data_column_name
         self.prompt_column_name = prompt_column_name
@@ -60,28 +63,17 @@ class UpStageDialoguesDataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        if not self.is_causal:
-            encoded = self.encode_text(
-                data=self.datas[idx],
-                data_type="data",
-            )
-            label = self.encode_text(
-                data=self.labels[idx],
-                data_type="target",
-            )["input_ids"]
-            encoded["labels"] = label
+        if self.is_preprocessed:
+            prompt = self.datas[idx] + self.labels[idx]
         else:
-            if self.is_preprocessed:
-                prompt = self.datas[idx] + self.labels[idx]
-            else:
-                prompt = self.generate_prompt(
-                    data=self.datas[idx],
-                    label=self.labels[idx],
-                )
-            encoded = self.encode_text(
-                data=prompt,
-                data_type="data",
+            prompt = self.generate_prompt(
+                data=self.datas[idx],
+                label=self.labels[idx],
             )
+        encoded = self.encode_text(
+            data=prompt,
+            data_type="data",
+        )
         if "token_type_ids" in encoded.keys():
             del encoded["token_type_ids"]
         return {
@@ -90,18 +82,28 @@ class UpStageDialoguesDataset(Dataset):
         }
 
     def get_dataset(self) -> Dict[str, List[Any]]:
-        if self.split in ["train", "test"]:
+        if self.split in ["train", "val"]:
+            if self.is_preprocessed:
+                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/train.csv"
+            else:
+                csv_path = f"{self.data_path}/train.csv"
+            data = pd.read_csv(csv_path)
+            data = data.fillna("_")
+            train_data, val_data = train_test_split(
+                data,
+                test_size=self.split_ratio,
+                random_state=self.seed,
+                shuffle=True,
+            )
+            if self.split == "train":
+                data = train_data
+            else:
+                data = val_data
+        elif self.split == "test":
             if self.is_preprocessed:
                 csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/{self.split}.csv"
             else:
                 csv_path = f"{self.data_path}/{self.split}.csv"
-            data = pd.read_csv(csv_path)
-            data = data.fillna("_")
-        elif self.split == "val":
-            if self.is_preprocessed:
-                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/dev.csv"
-            else:
-                csv_path = f"{self.data_path}/dev.csv"
             data = pd.read_csv(csv_path)
             data = data.fillna("_")
         elif self.split == "predict":
@@ -131,13 +133,10 @@ class UpStageDialoguesDataset(Dataset):
                     )
         else:
             raise ValueError(f"Inavalid split: {self.split}")
-        if not self.is_causal:
-            datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
+        if self.is_preprocessed:
+            datas = data[self.prompt_column_name].tolist()
         else:
-            if self.is_preprocessed:
-                datas = data[self.prompt_column_name].tolist()
-            else:
-                datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
+            datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
         labels = data[self.target_column_name].tolist()
         return {
             "datas": datas,
@@ -150,13 +149,10 @@ class UpStageDialoguesDataset(Dataset):
         data_type: str,
     ) -> Dict[str, torch.Tensor]:
         if data_type == "data":
-            if not self.is_causal:
+            if self.split == "predict":
                 max_length = self.data_max_length
             else:
-                if self.split == "predict":
-                    max_length = self.data_max_length
-                else:
-                    max_length = self.data_max_length + self.target_max_length
+                max_length = self.data_max_length + self.target_max_length
         elif data_type == "target":
             max_length = self.target_max_length
         else:
@@ -177,23 +173,26 @@ class UpStageDialoguesDataset(Dataset):
         data: str,
         label: str,
     ) -> str:
-        default_system_prompt = "너의 역할은 대화 내용을 요약해주는 요약 전문가야. 다음 사람들의 대화 내용을 보고 적절히 요약해줘."
+        default_system_prompt = """
+너는 과학 질문에 대한 답변을 제공하는 챗봇이야.
+너의 역할은 사용자들이 과학적 주제에 대해 궁금해하는 질문에 명확하고 정확한 답변을 제공하는 거야.
+"""
         if self.split == "predict":
             prompt = f"""### Instruction:
-            {default_system_prompt} 
+{default_system_prompt} 
 
-            ### Input:
-            {data.strip()}
+### Input(질문):
+{data.strip()}
 
-            ### Response:
-            """.strip()
+### Response(답변):
+""".strip()
         else:
             prompt = f"""### Instruction:
-            {default_system_prompt} 
+{default_system_prompt} 
 
-            ### Input:
-            {data.strip()}
+### Input(질문):
+{data.strip()}
 
-            ### Response:
-            {label} """.strip()
+### Response(답변):
+{label} """.strip()
         return prompt
