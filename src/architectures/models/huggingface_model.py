@@ -7,7 +7,6 @@ from torch import nn
 from transformers import (
     BitsAndBytesConfig,
     PreTrainedModel,
-    AutoModelForSeq2SeqLM,
     AutoModelForCausalLM,
     AutoTokenizer,
 )
@@ -19,7 +18,6 @@ class HuggingFaceModel(nn.Module):
     def __init__(
         self,
         pretrained_model_name: str,
-        is_causal: bool,
         is_preprocessed: bool,
         custom_data_encoder_path: str,
         merged_model_path: str,
@@ -32,7 +30,6 @@ class HuggingFaceModel(nn.Module):
     ) -> None:
         super().__init__()
         self.pretrained_model_name = pretrained_model_name
-        self.is_causal = is_causal
         self.is_preprocessed = is_preprocessed
         if self.is_preprocessed:
             data_encoder_path = (
@@ -60,12 +57,10 @@ class HuggingFaceModel(nn.Module):
             self.precision = torch.float32
         elif precision == 16 or precision == "16":
             self.precision = torch.float16
-            if self.is_causal:
-                self.attn_implementation = "flash_attention_2"
+            self.attn_implementation = "flash_attention_2"
         elif precision == "bf16":
             self.precision = torch.bfloat16
-            if self.is_causal:
-                self.attn_implementation = "flash_attention_2"
+            self.attn_implementation = "flash_attention_2"
         else:
             self.precision = "auto"
 
@@ -107,11 +102,8 @@ class HuggingFaceModel(nn.Module):
         target_max_length: int,
         target_min_length: int,
     ) -> torch.Tensor:
-        if not self.is_causal:
-            options["max_length"] = target_max_length
-        else:
-            options["max_new_tokens"] = target_max_length
-            options["min_new_tokens"] = target_min_length
+        options["max_new_tokens"] = target_max_length
+        options["min_new_tokens"] = target_min_length
         output = self.model.generate(
             **{
                 **encoded,
@@ -121,24 +113,14 @@ class HuggingFaceModel(nn.Module):
         return output
 
     def get_model(self) -> PreTrainedModel:
-        if not self.is_causal:
-            model = AutoModelForSeq2SeqLM.from_pretrained(
-                self.model_path,
-                output_hidden_states=False,
-                torch_dtype=self.precision,
-                attn_implementation=self.attn_implementation,
-                quantization_config=self.quantization_config,
-                device_map=self.device_map,
-            )
-        else:
-            model = AutoModelForCausalLM.from_pretrained(
-                self.model_path,
-                output_hidden_states=False,
-                torch_dtype=self.precision,
-                attn_implementation=self.attn_implementation,
-                quantization_config=self.quantization_config,
-                device_map=self.device_map,
-            )
+        model = AutoModelForCausalLM.from_pretrained(
+            self.model_path,
+            output_hidden_states=False,
+            torch_dtype=self.precision,
+            attn_implementation=self.attn_implementation,
+            quantization_config=self.quantization_config,
+            device_map=self.device_map,
+        )
 
         if model.config.pad_token_id is None:
             model.config.pad_token_id = model.config.eos_token_id
