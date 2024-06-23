@@ -22,7 +22,6 @@ split:
 
 batch_size: 16
 
-is_causal: True
 is_preprocessed: True
 data_column_name: Question
 prompt_column_name: cut_prompt
