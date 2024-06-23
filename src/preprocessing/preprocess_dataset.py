@@ -23,7 +23,8 @@ def preprocess_dataset(
 ) -> None:
     df = pd.read_csv(f"{config.connected_dir}/data/{config.mode}.csv")
     tokenizer = AutoTokenizer.from_pretrained(
-        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
+        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}",
+        use_fast=True,
     )
 
     def generate_prompt(
