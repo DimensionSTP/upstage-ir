@@ -1,6 +1,5 @@
 #!/bin/bash
 
-is_causal=True
 is_preprocessed=True
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -17,7 +16,6 @@ epochs="3 4"
 for epoch in $epochs
 do
     python main.py mode=predict \
-        is_causal=$is_causal \
         is_preprocessed=$is_preprocessed \
         is_tuned=$is_tuned \
         strategy=$strategy \
