@@ -1,6 +1,5 @@
 #!/bin/bash
 
-is_causal=True
 is_preprocessed=True
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -14,7 +13,6 @@ precision="bf16"
 batch_size=16
 
 python main.py mode=train \
-    is_causal=$is_causal \
     is_preprocessed=$is_preprocessed \
     is_tuned=$is_tuned \
     strategy=$strategy \
