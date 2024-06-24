@@ -20,20 +20,21 @@ split:
   test: test
   predict: predict
 
-batch_size: 16
+batch_size: 32
 
+split_ratio: 0.1
 is_preprocessed: True
-data_column_name: Question
+data_column_name: question
 prompt_column_name: cut_prompt
-target_column_name: Answer
+target_column_name: answer
 upload_user: beomi
 model_type: OPEN-SOLAR-KO-10.7B
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
 merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
-data_max_length: 1024
-target_max_length: 256
-target_min_length: 16
+data_max_length: 508
+target_max_length: 260
+target_min_length: 21
 
 quantization_type: origin
 quantization_config:
