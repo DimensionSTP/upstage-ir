@@ -1,16 +1,16 @@
 #!/bin/bash
 
-is_preprocessed=True
+is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="beomi"
 model_type="OPEN-SOLAR-KO-10.7B"
 quantization_type="origin"
 peft_type="origin"
-data_max_length=1024
-target_max_length=256
+data_max_length=508
+target_max_length=260
 precision="bf16"
-batch_size=16
+batch_size=32
 
 python main.py mode=train \
     is_preprocessed=$is_preprocessed \
