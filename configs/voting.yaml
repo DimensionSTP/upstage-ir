@@ -4,7 +4,7 @@ defaults:
 run_name: soft_voting
 work_dir: ${hydra:runtime.cwd}
 
-package_name: upstage-nlp
+package_name: upstage-ir
 connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 voted_name: soft_voting
 
