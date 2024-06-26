@@ -97,5 +97,7 @@ logit_name: ${save_detail}-epoch=${epoch}
 pred_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
+user_name: ${oc.env:USER_NAME}
+
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
