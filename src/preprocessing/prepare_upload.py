@@ -6,6 +6,7 @@ dotenv.load_dotenv(
 
 import os
 import re
+import json
 
 import torch
 
@@ -48,8 +49,18 @@ def prepare_upload(
     original_model.load_state_dict(model_state_dict)
     state_dict = original_model.state_dict()
     keys = list(state_dict.keys())
-    num_splits = 5
+    num_splits = 10
     split_size = len(keys) // num_splits
+    total_size = sum(
+        param.numel() * param.element_size() for param in state_dict.values()
+    )
+    index_dict = {
+        "metadata": {
+            "total_size": total_size,
+            "format": "pt",
+        },
+        "weight_map": {},
+    }
 
     if not os.path.exists(save_dir):
         os.makedirs(
@@ -57,8 +68,22 @@ def prepare_upload(
             exist_ok=True,
         )
     for i in tqdm(range(0, len(keys), split_size)):
+        safe_tensors_name = f"model-{i//split_size:05d}-of-{num_splits:05d}.safetensors"
         part_state_dict = {k: state_dict[k] for k in keys[i : i + split_size]}
-        save_file(part_state_dict, f"{save_dir}/model_part_{i//split_size}.safetensors")
+        part_state_dict_mapping = {
+            k: safe_tensors_name for k in keys[i : i + split_size]
+        }
+        index_dict["weight_map"].update(part_state_dict_mapping)
+        save_file(
+            part_state_dict,
+            f"{save_dir}/{safe_tensors_name}",
+        )
+    with open(f"{save_dir}/model.safetensors.index.json", "w") as f:
+        json.dump(
+            index_dict,
+            f,
+            indent=2,
+        )
     tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
     tokenizer.save_pretrained(save_dir)
     model_config = AutoConfig.from_pretrained(config.pretrained_model_name)
