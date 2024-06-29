@@ -28,7 +28,21 @@ def prepare_upload(
     config: DictConfig,
 ) -> None:
     save_dir = f"{config.connected_dir}/prepare_upload/{config.pretrained_model_name}/epoch={config.epoch}"
-    checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
+    if config.strategy in [
+        "deepspeed_stage_3",
+        "deepspeed_stage_3_offload",
+    ]:
+        checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
+    elif config.strategy in [
+        "deepspeed_stage_1",
+        "deepspeed_stage_2",
+        "deepspeed_stage_2_offload",
+    ]:
+        checkpoint = torch.load(
+            f"{config.ckpt_path}/checkpoint/mp_rank_00_model_states.pt"
+        )
+    else:
+        checkpoint = torch.load(config.ckpt_path)
     checkpoint_state_dict = checkpoint["state_dict"]
     model_state_dict = {}
     for k, v in list(checkpoint_state_dict.items()):
