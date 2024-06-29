@@ -105,7 +105,9 @@ def prepare_upload(
     tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
     tokenizer.save_pretrained(save_dir)
     model_config = AutoConfig.from_pretrained(config.pretrained_model_name)
-    model_config._name_or_path = f"{config.user_name}/{config.model_type}-scientificQA"
+    model_config._name_or_path = (
+        f"{config.user_name}/{config.model_type}-{config.upload_tag}"
+    )
     model_config.torch_dtype = "float32"
     model_config.save_pretrained(save_dir)
 
