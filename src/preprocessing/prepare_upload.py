@@ -57,7 +57,6 @@ def prepare_upload(
     index_dict = {
         "metadata": {
             "total_size": total_size,
-            "format": "pt",
         },
         "weight_map": {},
     }
@@ -79,6 +78,9 @@ def prepare_upload(
         save_file(
             part_state_dict,
             f"{save_dir}/{safe_tensors_name}",
+            metadata={
+                "format": "pt",
+            },
         )
     with open(f"{save_dir}/model.safetensors.index.json", "w") as f:
         json.dump(
