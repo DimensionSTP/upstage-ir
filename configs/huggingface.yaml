@@ -99,6 +99,7 @@ submission_name: ${save_detail}-epoch=${epoch}
 
 user_name: ${oc.env:USER_NAME}
 upload_tag: scientificQA
+num_safetensors: 10
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
