@@ -28,19 +28,8 @@ def prepare_upload(
     config: DictConfig,
 ) -> None:
     save_dir = f"{config.connected_dir}/prepare_upload/{config.pretrained_model_name}/epoch={config.epoch}"
-    if config.strategy in [
-        "deepspeed_stage_3",
-        "deepspeed_stage_3_offload",
-    ]:
+    if config.strategy.startswith("deepspeed"):
         checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
-    elif config.strategy in [
-        "deepspeed_stage_1",
-        "deepspeed_stage_2",
-        "deepspeed_stage_2_offload",
-    ]:
-        checkpoint = torch.load(
-            f"{config.ckpt_path}/checkpoint/mp_rank_00_model_states.pt"
-        )
     else:
         checkpoint = torch.load(config.ckpt_path)
     checkpoint_state_dict = checkpoint["state_dict"]
@@ -63,7 +52,7 @@ def prepare_upload(
     original_model.load_state_dict(model_state_dict)
     state_dict = original_model.state_dict()
     keys = list(state_dict.keys())
-    num_splits = 10
+    num_splits = config.num_safetensors
     split_size = len(keys) // num_splits
     total_size = sum(
         param.numel() * param.element_size() for param in state_dict.values()
@@ -108,7 +97,8 @@ def prepare_upload(
     model_config._name_or_path = (
         f"{config.user_name}/{config.model_type}-{config.upload_tag}"
     )
-    model_config.torch_dtype = "float32"
+    if config.strategy.startswith("deepspeed"):
+        model_config.torch_dtype = "float32"
     model_config.save_pretrained(save_dir)
 
 
