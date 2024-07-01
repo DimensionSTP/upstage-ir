@@ -1,6 +1,7 @@
 #!/bin/bash
 
 path="src/postprocessing"
+is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="beomi"
