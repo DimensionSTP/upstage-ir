@@ -30,6 +30,7 @@ is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
 strategy: ${strategy}
 lr: ${lr}
+weight_decay: ${weight_decay}
 period: ${period}
 eta_min: ${eta_min}
 interval: step
