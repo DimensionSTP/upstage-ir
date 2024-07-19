@@ -101,5 +101,8 @@ user_name: ${oc.env:USER_NAME}
 upload_tag: scientificQA
 num_safetensors: 10
 
+openai_api_key: ${oc.env:OPENAI_API_KEY}
+google_api_key: ${oc.env:GOOGLE_API_KEY}
+
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
