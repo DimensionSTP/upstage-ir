@@ -90,6 +90,13 @@ class HuggingFaceTuner:
                 high=self.hparams.lr.high,
                 log=self.hparams.lr.log,
             )
+        if self.hparams.weight_decay:
+            params["weight_decay"] = trial.suggest_float(
+                name="weight_decay",
+                low=self.hparams.weight_decay.low,
+                high=self.hparams.weight_decay.high,
+                log=self.hparams.weight_decay.log,
+            )
         if self.hparams.period:
             params["period"] = trial.suggest_int(
                 name="period",
@@ -126,6 +133,7 @@ class HuggingFaceTuner:
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             strategy=self.module_params.strategy,
             lr=params["lr"],
+            weight_decay=params["weight_decay"],
             period=params["period"],
             eta_min=params["eta_min"],
             interval=self.module_params.interval,
