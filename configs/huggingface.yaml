@@ -53,6 +53,7 @@ peft_config:
   inference_mode: False
 
 lr: 0.0001
+weight_decay: 0.01
 period: 2
 eta_min: 0.00001
 options:
