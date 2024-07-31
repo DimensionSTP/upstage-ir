@@ -26,8 +26,8 @@ class HuggingFaceArchitecture(LightningModule):
         strategy: str,
         lr: float,
         weight_decay: float,
-        period: int,
-        eta_min: float,
+        half_period: int,
+        eta_min_rate: float,
         interval: str,
         options: Dict[str, Any],
         target_max_length: int,
@@ -53,8 +53,8 @@ class HuggingFaceArchitecture(LightningModule):
         self.strategy = strategy
         self.lr = lr
         self.weight_decay = weight_decay
-        self.period = period
-        self.eta_min = eta_min
+        self.half_period = half_period
+        self.eta_min_rate = eta_min_rate
         self.interval = interval
         self.options = options
         self.target_max_length = target_max_length
@@ -125,11 +125,12 @@ class HuggingFaceArchitecture(LightningModule):
                 lr=self.lr,
                 weight_decay=self.weight_decay,
             )
-        t_max = self.period * self.trainer.num_training_batches
+        t_max = self.half_period * self.trainer.num_training_batches
+        eta_min = self.lr * self.eta_min_rate
         scheduler = optim.lr_scheduler.CosineAnnealingLR(
             optimizer=optimizer,
             T_max=t_max,
-            eta_min=self.eta_min,
+            eta_min=eta_min,
         )
         return {
             "optimizer": optimizer,
