@@ -4,19 +4,19 @@ hparams:
     - beomi/OPEN-SOLAR-KO-10.7B
   lr:
     low: 0.00005
-    high: 0.0002
+    high: 0.0005
     log: False
   weight_decay:
     low: 0.001
     high: 0.01
     log: False
-  period:
+  half_period:
     low: 1
     high: 10
     log: False
-  eta_min:
-    low: 0.0000125
-    high: 0.00005
+  eta_min_rate:
+    low: 0.05
+    high: 0.5
     log: False
 
 module_params:
