@@ -24,9 +24,7 @@ def merge_model(
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id
     model.resize_token_embeddings(len(tokenizer))
-    model.save_pretrained(
-        f"{config.connected_dir}/data/merged_model/{config.pretrained_model_name}"
-    )
+    model.save_pretrained(config.merged_model_path)
 
 
 if __name__ == "__main__":
