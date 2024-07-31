@@ -8,7 +8,7 @@ python $path/train_tokenizer.py
 python $path/merge_tokenizer.py
 python $path/merge_model.py
 
-dataset_modes="train dev test"
+dataset_modes="train"
 
 for dataset_mode in $dataset_modes
 do
