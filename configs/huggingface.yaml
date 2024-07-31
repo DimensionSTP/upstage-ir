@@ -54,8 +54,8 @@ peft_config:
 
 lr: 0.0001
 weight_decay: 0.01
-period: 2
-eta_min: 0.00001
+half_period: 1
+eta_min_rate: 0.1
 options:
   return_dict_in_generate: True
   output_scores: True
