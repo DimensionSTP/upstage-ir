@@ -122,7 +122,7 @@ def prepare_upload(
     )
     model_config.torch_dtype = torch_dtype
     if config.is_preprocessed:
-        model_config.vocab_size = tokenizer.vocab_size
+        model_config.vocab_size = len(tokenizer)
     model_config.save_pretrained(save_dir)
 
 
