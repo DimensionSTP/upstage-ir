@@ -5,6 +5,7 @@ model:
   pretrained_model_name: ${pretrained_model_name}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  left_padding: ${left_padding}
   merged_model_path: ${merged_model_path}
   precision: ${precision}
   mode: ${mode}
@@ -28,6 +29,7 @@ model:
 pretrained_model_name: ${pretrained_model_name}
 is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
+left_padding: ${left_padding}
 strategy: ${strategy}
 lr: ${lr}
 weight_decay: ${weight_decay}

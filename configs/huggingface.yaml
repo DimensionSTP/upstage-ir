@@ -30,7 +30,8 @@ target_column_name: answer
 upload_user: beomi
 model_type: OPEN-SOLAR-KO-10.7B
 pretrained_model_name: ${upload_user}/${model_type}
-custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
+custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer/${pretrained_model_name}
+left_padding: False
 merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
 data_max_length: 508
 target_max_length: 260

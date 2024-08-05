@@ -11,5 +11,6 @@ num_devices: ${devices}
 batch_size: ${batch_size}
 pretrained_model_name: ${pretrained_model_name}
 custom_data_encoder_path: ${custom_data_encoder_path}
+left_padding: ${left_padding}
 data_max_length: ${data_max_length}
 target_max_length: ${target_max_length}
