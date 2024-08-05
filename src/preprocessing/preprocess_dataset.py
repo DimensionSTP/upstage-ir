@@ -23,7 +23,7 @@ def preprocess_dataset(
 ) -> None:
     df = pd.read_csv(f"{config.connected_dir}/data/{config.mode}.csv")
     tokenizer = AutoTokenizer.from_pretrained(
-        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}",
+        config.custom_data_encoder_path,
         use_fast=True,
     )
 

@@ -17,9 +17,7 @@ from omegaconf import DictConfig
 def merge_model(
     config: DictConfig,
 ) -> None:
-    tokenizer = AutoTokenizer.from_pretrained(
-        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
-    )
+    tokenizer = AutoTokenizer.from_pretrained(config.custom_data_encoder_path)
     model = AutoModel.from_pretrained(config.pretrained_model_name)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id

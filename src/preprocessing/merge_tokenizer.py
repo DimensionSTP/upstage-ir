@@ -33,16 +33,12 @@ def merge_tokenizer(
 
     tokenizer.add_tokens(new_tokens)
 
-    if not os.path.exists(
-        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
-    ):
+    if not os.path.exists(config.custom_data_encoder_path):
         os.makedirs(
-            f"{config.custom_data_encoder_path}/{config.pretrained_model_name}",
+            config.custom_data_encoder_path,
             exist_ok=True,
         )
-    tokenizer.save_pretrained(
-        f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
-    )
+    tokenizer.save_pretrained(config.custom_data_encoder_path)
 
 
 if __name__ == "__main__":
