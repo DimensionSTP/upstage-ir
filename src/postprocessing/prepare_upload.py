@@ -48,7 +48,18 @@ def prepare_upload(
                 )
             model_state_dict[k] = v
 
-    original_model = AutoModelForCausalLM.from_pretrained(config.pretrained_model_name)
+    if config.is_preprocessed:
+        if os.path.exists(config.merged_model_path):
+            model_path = config.merged_model_path
+        else:
+            model_path = config.pretrained_model_name
+
+        if os.path.exists(config.custom_data_encoder_path):
+            data_encoder_path = config.custom_data_encoder_path
+        else:
+            data_encoder_path = config.pretrained_model_name
+
+    original_model = AutoModelForCausalLM.from_pretrained(model_path)
     original_model.load_state_dict(model_state_dict)
     state_dict = original_model.state_dict()
     if config.precision == 32 or config.precision == "32":
@@ -103,13 +114,15 @@ def prepare_upload(
             f,
             indent=2,
         )
-    tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
+    tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
     tokenizer.save_pretrained(save_dir)
-    model_config = AutoConfig.from_pretrained(config.pretrained_model_name)
+    model_config = AutoConfig.from_pretrained(model_path)
     model_config._name_or_path = (
         f"{config.user_name}/{config.model_type}-{config.upload_tag}"
     )
     model_config.torch_dtype = torch_dtype
+    if config.is_preprocessed:
+        model_config.vocab_size = tokenizer.vocab_size
     model_config.save_pretrained(save_dir)
 
 
