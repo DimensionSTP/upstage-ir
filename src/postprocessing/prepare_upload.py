@@ -27,7 +27,13 @@ from omegaconf import DictConfig
 def prepare_upload(
     config: DictConfig,
 ) -> None:
-    save_dir = f"{config.connected_dir}/prepare_upload/{config.pretrained_model_name}/epoch={config.epoch}"
+    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/epoch={config.epoch}"
+    if not os.path.exists(save_dir):
+        os.makedirs(
+            save_dir,
+            exist_ok=True,
+        )
+
     if config.strategy.startswith("deepspeed"):
         checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
     else:
@@ -48,20 +54,6 @@ def prepare_upload(
                 )
             model_state_dict[k] = v
 
-    if config.is_preprocessed:
-        if os.path.exists(config.merged_model_path):
-            model_path = config.merged_model_path
-        else:
-            model_path = config.pretrained_model_name
-
-        if os.path.exists(config.custom_data_encoder_path):
-            data_encoder_path = config.custom_data_encoder_path
-        else:
-            data_encoder_path = config.pretrained_model_name
-
-    original_model = AutoModelForCausalLM.from_pretrained(model_path)
-    original_model.load_state_dict(model_state_dict)
-    state_dict = original_model.state_dict()
     if config.precision == 32 or config.precision == "32":
         safetensors_dtype = torch.float32
         torch_dtype = "float32"
@@ -73,6 +65,32 @@ def prepare_upload(
         torch_dtype = "bfloat16"
     else:
         raise ValueError(f"Invalid precision type: {config.precision}")
+
+    if config.is_preprocessed:
+        if os.path.exists(config.custom_data_encoder_path):
+            data_encoder_path = config.custom_data_encoder_path
+        else:
+            data_encoder_path = config.pretrained_model_name
+
+        if os.path.exists(config.merged_model_path):
+            model_path = config.merged_model_path
+        else:
+            model_path = config.pretrained_model_name
+
+    tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
+    tokenizer.save_pretrained(save_dir)
+    model_config = AutoConfig.from_pretrained(model_path)
+    model_config._name_or_path = (
+        f"{config.user_name}/{config.model_detail}-{config.upload_tag}"
+    )
+    model_config.torch_dtype = torch_dtype
+    model_config.vocab_size = len(tokenizer)
+    model_config.save_pretrained(save_dir)
+
+    original_model = AutoModelForCausalLM.from_pretrained(model_path)
+    original_model.resize_token_embeddings(len(tokenizer))
+    original_model.load_state_dict(model_state_dict)
+    state_dict = original_model.state_dict()
     keys = list(state_dict.keys())
     num_splits = config.num_safetensors
     split_size = len(keys) // num_splits
@@ -86,11 +104,6 @@ def prepare_upload(
         "weight_map": {},
     }
 
-    if not os.path.exists(save_dir):
-        os.makedirs(
-            save_dir,
-            exist_ok=True,
-        )
     for i in tqdm(range(num_splits)):
         safe_tensors_name = f"model-{i+1:05d}-of-{num_splits:05d}.safetensors"
         part_state_dict = {
@@ -114,16 +127,6 @@ def prepare_upload(
             f,
             indent=2,
         )
-    tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
-    tokenizer.save_pretrained(save_dir)
-    model_config = AutoConfig.from_pretrained(model_path)
-    model_config._name_or_path = (
-        f"{config.user_name}/{config.model_type}-{config.upload_tag}"
-    )
-    model_config.torch_dtype = torch_dtype
-    if config.is_preprocessed:
-        model_config.vocab_size = len(tokenizer)
-    model_config.save_pretrained(save_dir)
 
 
 if __name__ == "__main__":

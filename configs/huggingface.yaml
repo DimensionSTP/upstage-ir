@@ -100,7 +100,8 @@ pred_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
 user_name: ${oc.env:USER_NAME}
-upload_tag: scientificQA
+model_detail: OPEN-SOLAR-KO-10.7B
+upload_tag: scientific-qa
 num_safetensors: 10
 
 openai_api_key: ${oc.env:OPENAI_API_KEY}
