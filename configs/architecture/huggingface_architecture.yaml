@@ -33,7 +33,7 @@ left_padding: ${left_padding}
 strategy: ${strategy}
 lr: ${lr}
 weight_decay: ${weight_decay}
-half_period: ${half_period}
+warmup_rate: ${warmup_rate}
 eta_min_rate: ${eta_min_rate}
 interval: step
 options: ${options}
