@@ -53,10 +53,10 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.0001
+lr: 0.00001
 weight_decay: 0.01
-half_period: 1
-eta_min_rate: 0.1
+warmup_rate: 0.05
+eta_min_rate: 0.01
 options:
   return_dict_in_generate: True
   output_scores: True
@@ -75,7 +75,7 @@ precision: bf16
 accumulate_grad_batches: 1
 gradient_clip_val: 1
 gradient_clip_algorithm: norm
-epoch: 100
+epoch: 5
 
 model_name: HuggingFace
 dataset_name: UpStageDocumentQA
