@@ -66,16 +66,13 @@ def prepare_upload(
     else:
         raise ValueError(f"Invalid precision type: {config.precision}")
 
+    data_encoder_path = config.pretrained_model_name
+    model_path = config.pretrained_model_name
     if config.is_preprocessed:
         if os.path.exists(config.custom_data_encoder_path):
             data_encoder_path = config.custom_data_encoder_path
-        else:
-            data_encoder_path = config.pretrained_model_name
-
         if os.path.exists(config.merged_model_path):
             model_path = config.merged_model_path
-        else:
-            model_path = config.pretrained_model_name
 
     tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
     tokenizer.save_pretrained(save_dir)
