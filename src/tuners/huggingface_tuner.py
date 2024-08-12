@@ -97,12 +97,12 @@ class HuggingFaceTuner:
                 high=self.hparams.weight_decay.high,
                 log=self.hparams.weight_decay.log,
             )
-        if self.hparams.half_period:
-            params["half_period"] = trial.suggest_int(
-                name="half_period",
-                low=self.hparams.half_period.low,
-                high=self.hparams.half_period.high,
-                log=self.hparams.half_period.log,
+        if self.hparams.warmup_rate:
+            params["warmup_rate"] = trial.suggest_int(
+                name="warmup_rate",
+                low=self.hparams.warmup_rate.low,
+                high=self.hparams.warmup_rate.high,
+                log=self.hparams.warmup_rate.log,
             )
         if self.hparams.eta_min_rate:
             params["eta_min_rate"] = trial.suggest_float(
@@ -134,7 +134,7 @@ class HuggingFaceTuner:
             strategy=self.module_params.strategy,
             lr=params["lr"],
             weight_decay=params["weight_decay"],
-            half_period=params["half_period"],
+            warmup_rate=params["warmup_rate"],
             eta_min_rate=params["eta_min_rate"],
             interval=self.module_params.interval,
             options=self.module_params.options,
