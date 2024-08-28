@@ -3,25 +3,26 @@ hparams:
   pretrained_model_name:
     - beomi/OPEN-SOLAR-KO-10.7B
   lr:
-    low: 0.000005
-    high: 0.00005
+    low: 5e-6
+    high: 5e-5
     log: False
   weight_decay:
-    low: 0.001
-    high: 0.01
+    low: 1e-2
+    high: 1e-1
     log: False
-  warmup_rate:
-    low: 0.01
-    high: 0.1
+  warmup_ratio:
+    low: 1e-2
+    high: 1e-1
     log: False
-  eta_min_rate:
-    low: 0.005
-    high: 0.05
+  eta_min_ratio:
+    low: 5e-3
+    high: 5e-2
     log: False
 
 module_params:
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  left_padding: ${left_padding}
   merged_model_path: ${merged_model_path}
   model_execution_mode: ${mode}
   quantization_type: ${quantization_type}

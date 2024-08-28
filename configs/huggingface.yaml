@@ -53,14 +53,13 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.00001
-weight_decay: 0.01
-warmup_rate: 0.05
-eta_min_rate: 0.01
+lr: 1e-5
+weight_decay: 1e-2
+warmup_ratio: 5e-2
+eta_min_ratio: 1e-2
 options:
   return_dict_in_generate: True
   output_scores: True
-  no_repeat_ngram_size: 2
 
 monitor: val_loss
 tracking_direction: min
