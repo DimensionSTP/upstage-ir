@@ -51,6 +51,8 @@ class UpStageDocumentQADataset(Dataset):
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         if left_padding:
             self.data_encoder.padding_side = "left"
+        else:
+            self.data_encoder.padding_side = "right"
         dataset = self.get_dataset()
         self.datas = dataset["datas"]
         self.labels = dataset["labels"]

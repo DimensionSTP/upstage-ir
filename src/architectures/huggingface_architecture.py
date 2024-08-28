@@ -27,8 +27,8 @@ class HuggingFaceArchitecture(LightningModule):
         strategy: str,
         lr: float,
         weight_decay: float,
-        warmup_rate: float,
-        eta_min_rate: float,
+        warmup_ratio: float,
+        eta_min_ratio: float,
         interval: str,
         options: Dict[str, Any],
         target_max_length: int,
@@ -51,11 +51,13 @@ class HuggingFaceArchitecture(LightningModule):
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         if left_padding:
             self.data_encoder.padding_side = "left"
+        else:
+            self.data_encoder.padding_side = "right"
         self.strategy = strategy
         self.lr = lr
         self.weight_decay = weight_decay
-        self.warmup_rate = warmup_rate
-        self.eta_min_rate = eta_min_rate
+        self.warmup_ratio = warmup_ratio
+        self.eta_min_ratio = eta_min_ratio
         self.interval = interval
         self.options = options
         self.target_max_length = target_max_length
@@ -126,10 +128,10 @@ class HuggingFaceArchitecture(LightningModule):
                 lr=self.lr,
                 weight_decay=self.weight_decay,
             )
-        total_steps = self.trainer.estimated_stepping_batches * self.trainer.max_epochs
-        warmup_steps = int(total_steps * self.warmup_rate)
+        total_steps = self.trainer.estimated_stepping_batches
+        warmup_steps = int(total_steps * self.warmup_ratio)
         t_max = total_steps - warmup_steps
-        eta_min = self.lr * self.eta_min_rate
+        eta_min = self.lr * self.eta_min_ratio
 
         def lr_lambda(current_step):
             if current_step < warmup_steps:

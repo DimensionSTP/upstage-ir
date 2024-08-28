@@ -97,25 +97,26 @@ class HuggingFaceTuner:
                 high=self.hparams.weight_decay.high,
                 log=self.hparams.weight_decay.log,
             )
-        if self.hparams.warmup_rate:
-            params["warmup_rate"] = trial.suggest_int(
-                name="warmup_rate",
-                low=self.hparams.warmup_rate.low,
-                high=self.hparams.warmup_rate.high,
-                log=self.hparams.warmup_rate.log,
+        if self.hparams.warmup_ratio:
+            params["warmup_ratio"] = trial.suggest_int(
+                name="warmup_ratio",
+                low=self.hparams.warmup_ratio.low,
+                high=self.hparams.warmup_ratio.high,
+                log=self.hparams.warmup_ratio.log,
             )
-        if self.hparams.eta_min_rate:
-            params["eta_min_rate"] = trial.suggest_float(
-                name="eta_min_rate",
-                low=self.hparams.eta_min_rate.low,
-                high=self.hparams.eta_min_rate.high,
-                log=self.hparams.eta_min_rate.log,
+        if self.hparams.eta_min_ratio:
+            params["eta_min_ratio"] = trial.suggest_float(
+                name="eta_min_ratio",
+                low=self.hparams.eta_min_ratio.low,
+                high=self.hparams.eta_min_ratio.high,
+                log=self.hparams.eta_min_ratio.log,
             )
 
         model = HuggingFaceModel(
             pretrained_model_name=params["pretrained_model_name"],
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
+            left_padding=self.module_params.left_padding,
             merged_model_path=self.module_params.merged_model_path,
             precision=self.module_params.precision,
             mode=self.module_params.model_execution_mode,
@@ -131,11 +132,12 @@ class HuggingFaceTuner:
             pretrained_model_name=params["pretrained_model_name"],
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
+            left_padding=self.module_params.left_padding,
             strategy=self.module_params.strategy,
             lr=params["lr"],
             weight_decay=params["weight_decay"],
-            warmup_rate=params["warmup_rate"],
-            eta_min_rate=params["eta_min_rate"],
+            warmup_ratio=params["warmup_ratio"],
+            eta_min_ratio=params["eta_min_ratio"],
             interval=self.module_params.interval,
             options=self.module_params.options,
             target_max_length=self.module_params.target_max_length,

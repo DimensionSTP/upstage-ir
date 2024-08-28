@@ -44,6 +44,8 @@ class HuggingFaceModel(nn.Module):
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         if left_padding:
             self.data_encoder.padding_side = "left"
+        else:
+            self.data_encoder.padding_side = "right"
 
         self.merged_model_path = merged_model_path
         self.model_path = self.pretrained_model_name
