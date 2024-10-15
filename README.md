@@ -104,7 +104,7 @@ upload_user={upload_user}
 model_type={model_type}
 ```
 
-* Set data and target max lengt for model training and generation
+* Set data and target max length for model training and generation
 ```shell
 data_max_length={data_max_length} 
 target_max_length={target_max_length} 
