@@ -13,7 +13,7 @@ git clone https://github.com/DimensionSTP/upstage-ir.git
 cd upstage-ir
 
 # [OPTIONAL] create conda environment
-conda create -n myenv python=3.8
+conda create -n myenv python=3.10 -y
 conda activate myenv
 
 # install requirements
