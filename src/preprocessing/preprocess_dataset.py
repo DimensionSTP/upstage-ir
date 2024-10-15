@@ -71,10 +71,10 @@ def preprocess_dataset(
 {default_system_prompt} 
 
 ### Input:
-{data.strip()}
+{data}
 
 ### Response:
-""".strip()
+"""
         return prompt
 
     df["prompt"] = df[config.data_column_name].apply(generate_prompt)
