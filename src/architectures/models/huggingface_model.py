@@ -6,7 +6,6 @@ from torch import nn
 
 from transformers import (
     BitsAndBytesConfig,
-    PreTrainedModel,
     AutoModelForCausalLM,
     AutoTokenizer,
 )
@@ -115,7 +114,7 @@ class HuggingFaceModel(nn.Module):
         )
         return output
 
-    def get_model(self) -> PreTrainedModel:
+    def get_model(self) -> AutoModelForCausalLM:
         model = AutoModelForCausalLM.from_pretrained(
             self.model_path,
             output_hidden_states=False,
