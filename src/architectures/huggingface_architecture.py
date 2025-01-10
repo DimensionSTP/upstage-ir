@@ -304,11 +304,10 @@ class HuggingFaceArchitecture(LightningModule):
             .cpu()
             .numpy()
         )
-        if not os.path.exists(f"{self.per_device_save_path}/logits"):
-            os.makedirs(
-                f"{self.per_device_save_path}/logits",
-                exist_ok=True,
-            )
+        os.makedirs(
+            f"{self.per_device_save_path}/logits",
+            exist_ok=True,
+        )
         logit_file = f"{self.per_device_save_path}/logits/device_num={device_num}-batch_idx={batch_idx}.npy"
         if not os.path.exists(logit_file):
             np.save(
@@ -331,11 +330,10 @@ class HuggingFaceArchitecture(LightningModule):
             )
         )
         output = {index_list[i]: cleaned_generation[i] for i in range(len(index_list))}
-        if not os.path.exists(f"{self.per_device_save_path}/generations"):
-            os.makedirs(
-                f"{self.per_device_save_path}/generations",
-                exist_ok=True,
-            )
+        os.makedirs(
+            f"{self.per_device_save_path}/generations",
+            exist_ok=True,
+        )
         generation_file = f"{self.per_device_save_path}/generations/device_num={device_num}-batch_idx={batch_idx}.csv"
         df = pd.DataFrame(
             {

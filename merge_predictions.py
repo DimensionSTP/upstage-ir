@@ -62,11 +62,10 @@ def merge_predictions(
         sorted_logits,
         axis=-1,
     )
-    if not os.path.exists(f"{config.connected_dir}/logits"):
-        os.makedirs(
-            f"{config.connected_dir}/logits",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/logits",
+        exist_ok=True,
+    )
     with open(
         f"{config.connected_dir}/logits/{config.logit_name}.pickle",
         "wb",
@@ -75,11 +74,10 @@ def merge_predictions(
             sorted_logits,
             f,
         )
-    if not os.path.exists(f"{config.connected_dir}/preds"):
-        os.makedirs(
-            f"{config.connected_dir}/preds",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/preds",
+        exist_ok=True,
+    )
     with open(
         f"{config.connected_dir}/preds/{config.pred_name}.pickle",
         "wb",
@@ -99,11 +97,10 @@ def merge_predictions(
     if len(all_generations) > len(generation_df):
         all_generations = all_generations[: len(generation_df)]
     generation_df[config.target_column_name] = all_generations
-    if not os.path.exists(f"{config.connected_dir}/submissions"):
-        os.makedirs(
-            f"{config.connected_dir}/submissions",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/submissions",
+        exist_ok=True,
+    )
     generation_df.to_csv(
         f"{config.connected_dir}/submissions/{config.submission_name}.csv",
         index=False,

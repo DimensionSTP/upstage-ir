@@ -21,11 +21,10 @@ def make_corpus(
 ) -> None:
     train_df = pd.read_csv(f"{config.connected_dir}/data/train.csv")
 
-    if not os.path.exists(f"{config.connected_dir}/data/corpus"):
-        os.makedirs(
-            f"{config.connected_dir}/data/corpus",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/data/corpus",
+        exist_ok=True,
+    )
 
     with open(
         f"{config.connected_dir}/data/corpus/corpus.txt", "w", encoding="utf-8"

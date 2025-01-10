@@ -98,13 +98,10 @@ def preprocess_dataset(
             max_length=config.data_max_length,
         )
     )
-    if not os.path.exists(
-        f"{config.connected_dir}/data/preprocessed_dataset/{config.pretrained_model_name}"
-    ):
-        os.makedirs(
-            f"{config.connected_dir}/data/preprocessed_dataset/{config.pretrained_model_name}",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/data/preprocessed_dataset/{config.pretrained_model_name}",
+        exist_ok=True,
+    )
     df.to_csv(
         f"{config.connected_dir}/data/preprocessed_dataset/{config.pretrained_model_name}/{config.mode}.csv",
         index=False,

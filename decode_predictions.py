@@ -63,11 +63,10 @@ def decode_predictions(
         " ",
         regex=True,
     )
-    if not os.path.exists(f"{config.connected_dir}/from_decoded_predictions"):
-        os.makedirs(
-            f"{config.connected_dir}/from_decoded_predictions",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/from_decoded_predictions",
+        exist_ok=True,
+    )
     generation_df.to_csv(
         f"{config.connected_dir}/from_decoded_predictions/{config.pred_name}.csv",
         index=False,
